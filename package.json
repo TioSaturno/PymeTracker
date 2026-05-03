@@ -1,26 +1,30 @@
 {
-  "name": "pyme-nuevo",
-  "version": "0.1.0",
+  "name": "pymetracker",
+  "version": "1.0.0",
+  "description": "PymeTracker monorepo — web app + scraping service",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "shared/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev:web": "npm run dev --workspace=apps/web",
+    "build:web": "npm run build --workspace=apps/web",
+    "db:local": "docker compose -f shared/db/docker-compose.yml up -d",
+    "db:local:down": "docker compose -f shared/db/docker-compose.yml down",
+    "db:generate": "npm run generate --workspace=shared/db",
+    "db:migrate": "npm run migrate --workspace=shared/db",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "dependencies": {
-    "next": "16.2.4",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TioSaturno/PymeTracker.git"
   },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.4",
-    "tailwindcss": "^4",
-    "typescript": "^5"
-  }
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TioSaturno/PymeTracker/issues"
+  },
+  "homepage": "https://github.com/TioSaturno/PymeTracker#readme"
 }

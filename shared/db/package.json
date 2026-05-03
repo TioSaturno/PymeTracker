@@ -1,0 +1,22 @@
+{
+  "name": "@pymetracker/db",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    "./create-client": "./create-client.ts",
+    "./schema": "./schema.ts"
+  },
+  "scripts": {
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.19.4",
+    "typescript": "^5"
+  }
+}
