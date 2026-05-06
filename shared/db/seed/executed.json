@@ -1,0 +1,401 @@
+{
+  "empresas": [
+    {
+      "id": 6361019721390363000,
+      "nombre": "Santiago Sushi",
+      "calificaciones": {
+        "rating": 4.2,
+        "total_resenas": 606,
+        "rango_precio_gmaps": "$$",
+        "ultimas_resenas": [
+          "El restorant no es lo más fino que se puede ir, pero cumple con condiciones buenas. Solo he comido sushi en el local, ya lo he frecuentado unas 4 veces y puedo decir con certeza que es un local uwe vale la pena visitar sus precios son muy eccesibles para la calidad y tamaño de la porciones. Es un buen local de sushi, piezas con mucho ingrediente y bien preparadas. Los tiempos de espera son normales de unos 25-40 minutos según la cantidad de gente en el local. 100% recomendado, muy buen prsushi a muy bien precio.",
+          "Buena variedad en la carta de sushi tradicional y preparaciones propias, la presentación de los platos es buena y la relación precio/calidad muy buena también, el lugar es cómodo y la atención es cordial aunque no tan rápida. No posee patente de alcoholes por lo que sólo sirve cervezas sin alcohol. Un poco de despreocupación con el aire acondicionado. Aconsejable visitar al menos una vez.",
+          "Comida y promos accesibles, personal agradable, simpáticos y preocupados, ambiente calmado, música relajante, baños limpios y espaciosos.\nTodo muy cómodo e higiénico",
+          "Excelente calidad de sushi. Ingredientes frescos, sabrosos, buena cocción del arroz, suave, tierno, no pasado en vinagre. Realmente uno de los mejores sushis que he probado en la capital. Sin embargo la atención no fue muy grata, la garzona que nos atendió era muy distraída, poco carismática.\nComimos en el local y la verdad se demoró bastante, pocas opciones de bebestibles, no tenian agua mineral, té, no tenian postres.\nEl sushi excelente, pero falta mejorar los detalles anteriormente mencionados para poder recomendarlo.",
+          "100% recomendado!!\nEl sushi muy rico, buen tamaño y con el relleno ideal.\nRecomiendo pedir jugos, muy buenos también."
+        ]
+      },
+      "precios": null,
+      "sitio_web": "https://santiagosushi.cl/",
+      "google_maps_url": "https://maps.google.com/?cid=6361019721390362861",
+      "ubicacion": "Serrano 468, 0000820 Santiago, Región Metropolitana, Chile"
+    },
+    {
+      "id": 4856371402518782000,
+      "nombre": "Kamisushi MARCOLETA",
+      "calificaciones": {
+        "rating": 4.7,
+        "total_resenas": 1567,
+        "rango_precio_gmaps": "No especificado",
+        "ultimas_resenas": [
+          "Llevo pidiendo 2 años en el local, pero han bajado demasiado la calidad de los productos en este último tiempo. Esta bien que sean baratos pero no le ponen casi nada de relleno, los cortes mal hechos. El sabor no está mal, pero depende del roll, y estos tempura venían con restos quemados.",
+          "Excelente sushi me encanta siempre pido y tienen buenas promos 100% recomendados",
+          "Cambio la mano 🤦🤦🤦, cuando estaban los peruanos se demoran 15-20 minutos en el pedido, se ha ido deteriorando el servicio, me sorprende que se tarden ahora más de 2 horas, llegaron quemados y el plástico pegado y achurrascado, tuve que votar varios.\ncompartan algún dato de otro sushi por el sector.\nFueron buenos 🤷🤷🤷",
+          "Muy rico, delicioso, lo unico que solo es para realuzar el pedido, no se ouede servir en el local.",
+          "Excelente Servicio,en cuánto a rápidez de cocina y entrega,  pece a inconvenientes que se puedan presentar son eficientes y muy rico sus productos kami "
+        ]
+      },
+      "precios": [
+        {
+          "producto": "BEBIDAS 350 CC LATA",
+          "precio": 1800,
+          "imagen_url": null
+        },
+        {
+          "producto": "BEBIDA 1.5 LTS",
+          "precio": 3500,
+          "imagen_url": null
+        },
+        {
+          "producto": "AGUA PCM 500ML",
+          "precio": 990,
+          "imagen_url": null
+        },
+        {
+          "producto": "PACK AGUA PCM (12 UNIDADES)",
+          "precio": 8640,
+          "imagen_url": null
+        },
+        {
+          "producto": "AGUA PCM GASIFICADA 500CC",
+          "precio": 990,
+          "imagen_url": null
+        },
+        {
+          "producto": "20 PIEZAS TWINS",
+          "precio": 8700,
+          "imagen_url": null
+        },
+        {
+          "producto": "40 PIEZAS LUX",
+          "precio": 15500,
+          "imagen_url": null
+        },
+        {
+          "producto": "HAND ROLL",
+          "precio": 3500,
+          "imagen_url": null
+        },
+        {
+          "producto": "KAMINEITOR",
+          "precio": 6500,
+          "imagen_url": null
+        },
+        {
+          "producto": "40 PIEZAS ESTUDIANTE",
+          "precio": 11000,
+          "imagen_url": null
+        },
+        {
+          "producto": "100 PIEZAS LUX",
+          "precio": 30000,
+          "imagen_url": null
+        },
+        {
+          "producto": "40 PIEZAS FURAY",
+          "precio": 15000,
+          "imagen_url": null
+        },
+        {
+          "producto": "40 PIEZAS SUMMER",
+          "precio": 15500,
+          "imagen_url": null
+        },
+        {
+          "producto": "50 PIEZAS GOLOSOS",
+          "precio": 19400,
+          "imagen_url": null
+        }
+      ],
+      "sitio_web": "https://www.kamisushi.cl/",
+      "google_maps_url": "https://maps.google.com/?cid=4856371402518782259",
+      "ubicacion": "Marcoleta 558, 1080000 Santiago, Región Metropolitana, Chile"
+    },
+    {
+      "id": 1454916012582908700,
+      "nombre": "Aomori Nikkei & Sushi",
+      "calificaciones": {
+        "rating": 4.4,
+        "total_resenas": 1408,
+        "rango_precio_gmaps": "$$",
+        "ultimas_resenas": [
+          "El sushi lo peor parecía el barato que te venden en el mall (pocos ingredientes y exceso de arroz) y de pasada te cobran casi 9 Lucas, el sushero se excusa que esas son las medidas pero honestamente uno paga mas por el ego del sushero que por la calidad del producto, no le dejo una estrella por la calidad del sour y del otro plato de fondo que estaban buenos pero lamentablemente el sushi fue lo peor y gracias a la respuesta que me dio la mesera por la calidad del producto no volvería mas y no recomendaría el local.",
+          "Fui con mi mamá y hermana y la experiencia fue maravillosa, de partida la atención de la anfitriona demasiado atenta que escuchó que era mi cumpleaños y sin darme cuenta habló con mi mamá para sorprenderme con una torta exquisita con una velita, un marco para fotos y junto con el garzón que nos atendió me cantaron cumpleaños ♥️ No me lo esperaba para nada y fue muy lindo detalle, muy buena la atención por parte de ambos. En cuanto a la carta de sushi es demasiado rico todo, los cócteles también. Sobre los tiempos de espera, considero que para preparaciones de tipo Nikkei es normal esperar un rato ya que se nota que está todo muy fresco y es preparado en el momento, aparte dejan unos pancitos muy ricos con salsitas mientras esperas, así que no es nada terrible como leí en algunos comentarios. Mucha variedad y excelente calidad y presentación, para ir mil veces a probar todo. 10000% recomendado.",
+          "Una buena variedad de platos, presentación cuidada de los platos. Amable y oportuna  atención de Leidi.\nLas porciones son buenas, el precio razonables. Muy rica la comida.\nEl lomo saltado en buena cantidad, muy sabroso. Sachimi muy rico, pescado se siente fresco.  shirashi muy sabroso.\nSe agradece el pan con salsa para iniciar.",
+          "Me encanto....rica comida y buena atencion",
+          "recomiendo al 100%, la comida es de muy buena calidad, los tragos y jugos son exquisitos y la atención es un 10, he pedido delivery y he ido a comer allí, de lo mejor del sector 🫶🏻🫶🏻"
+        ]
+      },
+      "precios": [
+        {
+          "producto": "Lomo Salteado (Filete)",
+          "precio": 14900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Limonadas",
+          "precio": 4200,
+          "imagen_url": null
+        },
+        {
+          "producto": "Jugos Pulpa De Fruta",
+          "precio": 5200,
+          "imagen_url": null
+        },
+        {
+          "producto": "Sour Clasicos 2X",
+          "precio": 9800,
+          "imagen_url": null
+        },
+        {
+          "producto": "Seco de vacuno",
+          "precio": 14900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Ceviche De Pescado",
+          "precio": 13900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Ceviche Mixto",
+          "precio": 15900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Triologia De Ceviches",
+          "precio": 15900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Ceviche Carretillero",
+          "precio": 16900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Ceviche Aomori",
+          "precio": 16900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Leche De Tigre",
+          "precio": 9800,
+          "imagen_url": null
+        },
+        {
+          "producto": "Sugerencia 1 (18 Pzas)",
+          "precio": 16900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Sugerencia 2 (32 Pzas)",
+          "precio": 26900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Sugerencia 3 (48 Pzas)",
+          "precio": 36900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Sugerencia 4 (64 Pzas)",
+          "precio": 46900,
+          "imagen_url": null
+        },
+        {
+          "producto": "Camarones Tempura 8 Uds.",
+          "precio": 9800,
+          "imagen_url": null
+        },
+        {
+          "producto": "Camarones Nikkei 8 Uds.",
+          "precio": 9800,
+          "imagen_url": null
+        },
+        {
+          "producto": "Gyozas 5 Uds.",
+          "precio": 5600,
+          "imagen_url": null
+        },
+        {
+          "producto": "Yakitori",
+          "precio": 11200,
+          "imagen_url": null
+        },
+        {
+          "producto": "Torikatsu",
+          "precio": 11200,
+          "imagen_url": null
+        },
+        {
+          "producto": "Yakisoba",
+          "precio": 11200,
+          "imagen_url": null
+        },
+        {
+          "producto": "Yakisoba Vegetariano",
+          "precio": 10200,
+          "imagen_url": null
+        },
+        {
+          "producto": "Sopa Miso",
+          "precio": 6200,
+          "imagen_url": null
+        },
+        {
+          "producto": "Sopa Rammen",
+          "precio": 9800,
+          "imagen_url": null
+        },
+        {
+          "producto": "Chirashi Ebi",
+          "precio": 9800,
+          "imagen_url": null
+        },
+        {
+          "producto": "Chirashi Tory",
+          "precio": 9800,
+          "imagen_url": null
+        },
+        {
+          "producto": "Chirashi Aomori",
+          "precio": 10200,
+          "imagen_url": null
+        }
+      ],
+      "sitio_web": "https://aomoritoesca.cl/",
+      "google_maps_url": "https://maps.google.com/?cid=1454916012582908605",
+      "ubicacion": "Toesca 1920, 8370254 Santiago, Región Metropolitana, Chile"
+    },
+    {
+      "id": 6675100352275690000,
+      "nombre": "Meru Sushi ( Santiago Centro)",
+      "calificaciones": {
+        "rating": 4.4,
+        "total_resenas": 240,
+        "rango_precio_gmaps": "No especificado",
+        "ultimas_resenas": [
+          "Se demoraron como 1 hora en entregar el sushi, estaban quemados y sabían muy mal, además son carísimos y no son de buena calidad.\n\nEstaban preparados con arroz graneado, no de sushi, el kanikama estaba añejo y la mayoría de los rollos no traían palta.\n\nMientras comíamos se acercó una persona y nos estaba hablando cosas incómodas, y nadie fue capaz de echarlo del lugar.\n\nNo lo recomiendo en absoluto.\n\nEdit: Que se vean bien los rollos no significa que sepan bien, y si me di el tiempo de redactar esta reseña es porque realmente no vale la pena la comida. El hecho de tener buenas reseñas es un factor independiente de que el sushi que ayer comí estuviera malo.",
+          "Todo ok !\nLa señora que atiende muy amorosa y agradable.\nLas promociones convenientes y la comida es buena!\nTiempos de espera acorde\nSe recomienda de todas maneras",
+          "Completamente recomendado!!\nPedí para retirar y nada que decir. El sushi muy rico, los rellenos incluso tienen salmón a pesar de ser promociones. Los precios son asequibles. La señora que atiende es muy simpática. Quizás juzgaria un poco la salsa de soya porque se siente aguada, pero nada mas, lo demás todo perfecto.",
+          "Asquerosos handrolls. Puro arroz prácticamente. El sabor del frito es medo ácido. La atención deja que desear. Primera y última vez que vengo a comprar.",
+          "Muy buenos los productos, excelente atención, lugar tranquilo."
+        ]
+      },
+      "precios": null,
+      "sitio_web": "https://www.merusushi.cl/pedir",
+      "google_maps_url": "https://maps.google.com/?cid=6675100352275690045",
+      "ubicacion": "Lord Cochrane 291, 8320000 Santiago, Región Metropolitana, Chile"
+    },
+    {
+      "id": 7584235976356684000,
+      "nombre": "KAMISUSHI",
+      "calificaciones": {
+        "rating": 4.3,
+        "total_resenas": 493,
+        "rango_precio_gmaps": "No especificado",
+        "ultimas_resenas": [
+          "La atención es pésima, intente llamar por teléfono varias veces, sin éxito. Como vivo cerca fui al local y las personas que atendían cortaban el teléfono y no estaban haciendo nada, les pregunte que cual era el fin de cortar el teléfono si estaban haciendo vida social? Y me respondió una niña de pelo rojo que por lo que pagan, ya es arto lo que se hace...",
+          "Es una buena opción para sushi de buen precio, pero la atención de este local es pésima!!!\nSe preocupan de hablar entre los empleados en vez de atender a los clientes.\nEs una pena que las chicas del mesón y repartidores Sean así.\nUna chica de pelo rojo o naranjo, se le tiene que hablar 3 veces para que atiendan,\nY cuando se les pide una explicación al respecto, se cruzan de brazos y no te la dan.\nPara no volver.\nEl sushi de mami es bueno/regular, pero definitivamente no  recomiendo comprarlo en este local.",
+          "Muy bueno, rico y rapido",
+          "Me encanta!!! muy buen servicio, y rica comida.  Siempre son mi primera opción.  Felicitaciones y 100 por ciento recomendable.",
+          "La comida es muy sabrosa, pero pedí un cambio específico de proteína, por el que cobran bastante, y no lo hicieron. Tardan entre 60 y 90 minutos para entregar el pedido y más encima viene mal."
+        ]
+      },
+      "precios": [
+        {
+          "producto": "BEBESTIBLES BEBIDAS 350 CC LATA",
+          "precio": 1800,
+          "imagen_url": null
+        },
+        {
+          "producto": "BEBESTIBLES BEBIDA 1.5 LTS",
+          "precio": 3500,
+          "imagen_url": null
+        },
+        {
+          "producto": "AGUA PCM 500ML",
+          "precio": 990,
+          "imagen_url": null
+        },
+        {
+          "producto": "20 PIEZAS TWINS",
+          "precio": 8700,
+          "imagen_url": null
+        },
+        {
+          "producto": "40 PIEZAS LUX",
+          "precio": 15500,
+          "imagen_url": null
+        },
+        {
+          "producto": "HAND ROLL",
+          "precio": 3500,
+          "imagen_url": null
+        },
+        {
+          "producto": "KAMINEITOR",
+          "precio": 6500,
+          "imagen_url": null
+        },
+        {
+          "producto": "40 PIEZAS ESTUDIANTE",
+          "precio": 11000,
+          "imagen_url": null
+        },
+        {
+          "producto": "100 PIEZAS LUX",
+          "precio": 30000,
+          "imagen_url": null
+        },
+        {
+          "producto": "40 PIEZAS FURAY",
+          "precio": 15000,
+          "imagen_url": null
+        },
+        {
+          "producto": "40 PIEZAS SUMMER",
+          "precio": 15500,
+          "imagen_url": null
+        },
+        {
+          "producto": "50 PIEZAS GOLOSOS",
+          "precio": 19400,
+          "imagen_url": null
+        }
+      ],
+      "sitio_web": "http://www.sushikamisushi.cl/",
+      "google_maps_url": "https://maps.google.com/?cid=7584235976356684197",
+      "ubicacion": "San Pablo 2206, 8340238 Santiago, Región Metropolitana, Chile"
+    },
+    {
+      "id": 7706111561290094000,
+      "nombre": "Sushi Bamboo",
+      "calificaciones": {
+        "rating": 4.4,
+        "total_resenas": 81,
+        "rango_precio_gmaps": "No especificado",
+        "ultimas_resenas": [
+          "Excelente, rico, bien presentado, y por el horario y poca clientela en local se dio una conversación bastante amena. Que refresco la experiencia. Totalmente recomendable",
+          "El mejor sushi de santiago, sus preparaciones son frescas y con la cantidad apropiada 🥰 Llegué a este local porque era nueva en la zona y de acá no me fui más  😌 El ambiente es grato y se nota la dedicación ☺️",
+          "No tenía gusto por el sushi pero Bamboo cambió totalmente mi expectativa. Se ha vuelto mi lugar favorito desde que probé sus platillos. Muy recomendado y prometo que no defrauda, excelente proporción de ingredientes, insumos de calidad y excelente atención.",
+          "Pedí para domicilio 30 piezas tempura, muy rico todo. Las salsas y extras no las cobraron aparte, venian 2 soyas, 1 teriyaki, 1 wasabi, 1 jengibre encurtido rosado, me parece un buen agregado ya que en muchos lugares cobran por ello. Todo en orden, el tamaño de las piezas esta bien, ninguna vino rota, ningún detalle realmente. La entrega fue rápida.",
+          "Se volvió mi lugar favorito !! Vale la espera cada minuto de espera , los sabores frescos y recién hecho solo se consiguen ahí !! Toda mi familia se enamoró del lugar y los sabores !! Hasta mis amigos chinos van por qué aman los sabores solo de ahi!!"
+        ]
+      },
+      "precios": null,
+      "sitio_web": null,
+      "google_maps_url": "https://maps.google.com/?cid=7706111561290093484",
+      "ubicacion": "Av. España 184, 8370091 Santiago, Región Metropolitana, Chile"
+    }
+  ],
+  "busqueda": {
+    "tema": "Sushi",
+    "ubicacion": "Santiago"
+  },
+  "fecha": "2025-04-09",
+  "total_empresas": 6,
+  "mas_valorado": "Los clientes valoran principalmente la frescura de los ingredientes, las porciones generosas, una buena relación precio-calidad y la atención cordial. También aprecian la variedad de la carta y las promociones accesibles, así como la presentación cuidada de los platos.",
+  "mas_criticado": "Las críticas recurrentes se centran en los tiempos de espera excesivos, la calidad inconsistente (piezas quemadas, arroz pasado o exceso de arroz y poco relleno) y la atención al cliente deficiente (despreocupación, mala actitud). También se mencionan faltas de opciones en bebidas o postres y problemas con la exactitud de los pedidos.",
+  "analisis_tienda_base": null
+}
