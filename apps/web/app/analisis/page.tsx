@@ -23,7 +23,7 @@ export default function AnalisisPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch("/api/analytics?empresaId=1");
+        const response = await fetch("/api/analytics?tiendaId=1");
         if (!response.ok) {
           throw new Error("Error al obtener los datos");
         }

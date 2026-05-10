@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@pymetracker/db/create-client';
-import { analisis, tiendas } from '@pymetracker/db/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { analisis } from '@pymetracker/db/schema';
+import { eq } from 'drizzle-orm';
 
 const isMainProduct = (name: string) => {
   if (!name) return false;
@@ -119,22 +119,12 @@ const mergeEmpresas = (allPayloads: any[]) => {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const empresaIdParam = searchParams.get('empresaId');
-    const empresaId = empresaIdParam ? parseInt(empresaIdParam, 10) : 1;
-
-    const tiendasRows = await db.select({ id: tiendas.id })
-      .from(tiendas)
-      .where(eq(tiendas.empresaId, empresaId));
-
-    if (tiendasRows.length === 0) {
-      return NextResponse.json({ error: 'No stores found for this company' }, { status: 404 });
-    }
-
-    const tiendaIds = tiendasRows.map(t => t.id);
+    const tiendaIdParam = searchParams.get('tiendaId');
+    const tiendaId = tiendaIdParam ? parseInt(tiendaIdParam, 10) : 1;
 
     const records = await db.select()
       .from(analisis)
-      .where(inArray(analisis.tiendaId, tiendaIds));
+      .where(eq(analisis.tiendaId, tiendaId));
 
     if (records.length === 0) {
       return NextResponse.json({ error: 'No analysis data found' }, { status: 404 });
