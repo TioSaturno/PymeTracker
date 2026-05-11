@@ -42,7 +42,7 @@ async function main() {
         empresaId: empresa.id,
         nombre: "Marcos Admin",
         email: "marcos@pymetracker.cl",
-        passwordHash: "dummy",
+        passwordHash: "$2b$10$vsnCeVIR5fz9.1JrG.UHr.HJ9qVfkhHsfPbJl69My39ZQCWqOI2rO",
         rol: "admin",
       })
       .returning();
