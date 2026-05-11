@@ -2,6 +2,7 @@ import { db } from "../create-client";
 import * as schema from "../schema";
 import fs from "fs";
 import path from "path";
+import bcrypt from "bcryptjs";
 
 async function main() {
   console.log("🌱 Iniciando el proceso de seed...");
@@ -36,13 +37,14 @@ async function main() {
 
     // 4. Insertar Usuario (Admin)
     console.log("👤 Insertando usuario...");
+    const passwordHash = await bcrypt.hash("dummy", 10);
     const [usuario] = await db
       .insert(schema.usuarios)
       .values({
         empresaId: empresa.id,
         nombre: "Marcos Admin",
         email: "marcos@pymetracker.cl",
-        passwordHash: "dummy",
+        passwordHash: passwordHash,
         rol: "admin",
       })
       .returning();
