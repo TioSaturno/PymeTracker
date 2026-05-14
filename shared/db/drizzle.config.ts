@@ -7,6 +7,6 @@ export default defineConfig({
   dbCredentials: {
     url:
       process.env.DATABASE_URL ??
-      "postgres://loky:loky@localhost:5432/IngSoft",
+      "postgres://loky:loky@localhost:5433/IngSoft",
   },
 });

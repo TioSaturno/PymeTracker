@@ -8,7 +8,7 @@
     "shared/*"
   ],
   "scripts": {
-    "dev:web": "NEXT_IGNORE_INCORRECT_LOCKFILE=1 npm run dev --workspace=apps/web",
+    "dev:web": "cross-env NEXT_IGNORE_INCORRECT_LOCKFILE=1 npm run dev --workspace=apps/web",
     "scraper:pipeline": "npm run run:pipeline --workspace=apps/scraping",
     "build:web": "npm run build --workspace=apps/web",
     "db:local": "docker compose -f shared/db/docker-compose.yml up -d",
@@ -29,5 +29,13 @@
   "bugs": {
     "url": "https://github.com/TioSaturno/PymeTracker/issues"
   },
-  "homepage": "https://github.com/TioSaturno/PymeTracker#readme"
+  "homepage": "https://github.com/TioSaturno/PymeTracker#readme",
+  "devDependencies": {
+    "cross-env": "^10.1.0",
+    "esbuild": "^0.28.0",
+    "lightningcss-win32-x64-msvc": "^1.32.0"
+  },
+  "dependencies": {
+    "lucide-react": "^1.14.0"
+  }
 }
