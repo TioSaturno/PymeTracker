@@ -4,6 +4,8 @@ CREATE TABLE "analisis" (
 	"usuario_id" integer,
 	"status" varchar(20) DEFAULT 'pending',
 	"payload_data" jsonb NOT NULL,
+	"payload_procesado" jsonb,
+	"procesado" boolean DEFAULT false,
 	"fecha_ejecucion" timestamp DEFAULT now()
 );
 --> statement-breakpoint

@@ -15,6 +15,7 @@
     "jsonwebtoken": "^9.0.3",
     "next": "16.2.4",
     "postcss": "^8.5.14",
+    "openai": "^6.37.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "^2.12.7"
