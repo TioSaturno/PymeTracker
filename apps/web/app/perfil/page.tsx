@@ -52,11 +52,11 @@ export default function CreateProfilePage() {
     setMensaje({ tipo: '', texto: '' });
 
     try {
-      const response = await fetch('/api/empresa/perfil', { // Endpoint para actualizar empresa
-        method: 'PUT', 
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
+      const response = await fetch('/api/empresa/perfil', {
+  method: 'POST', // <--- IMPORTANTE: POST para crear
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(formData),
+});
 
       if (response.ok) {
         setMensaje({ tipo: 'success', texto: 'Perfil estructural actualizado con éxito.' });

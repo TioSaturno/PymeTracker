@@ -1,88 +1,79 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pymetracker/db/create-client";
-import { empresas } from "@pymetracker/db/schema";
+import { empresas, usuarios } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth";
 
-export async function PUT(request: NextRequest) {
+// --- POST: PARA CREAR (Tu /perfil) ---
+export async function POST(request: NextRequest) {
   try {
-    const usuario = requireAuth(request);
-    if (usuario instanceof NextResponse) return usuario;
-
-    if (!usuario.empresaId) {
-      return NextResponse.json(
-        { error: "El usuario no tiene una empresa asociada" },
-        { status: 400 }
-      );
-    }
+    const usuarioAuth = requireAuth(request);
+    if (usuarioAuth instanceof NextResponse) return usuarioAuth;
 
     const body = await request.json();
-    const { nombre, rubro } = body;
+    const { nombre, rubro, rut, direccion, comuna, telefono } = body;
 
-    if (!nombre) {
-      return NextResponse.json(
-        { error: "El nombre de la empresa es requerido" },
-        { status: 400 }
-      );
-    }
+    if (!nombre) return NextResponse.json({ error: "Nombre requerido" }, { status: 400 });
 
-    const result = await db
-      .update(empresas)
-      .set({
-        nombre,
-        rubro: rubro ?? undefined,
-      })
-      .where(eq(empresas.id, usuario.empresaId))
-      .returning();
+    // 1. Crear la empresa
+    const [nuevaEmpresa] = await db.insert(empresas).values({
+      nombre,
+      rubro,
+      rut,
+      direccion,
+      comuna,
+      telefono,
+    }).returning();
 
-    if (result.length === 0) {
-      return NextResponse.json(
-        { error: "Empresa no encontrada" },
-        { status: 404 }
-      );
-    }
+    // 2. Vincularla al usuario que está logueado
+    await db.update(usuarios)
+      .set({ empresaId: nuevaEmpresa.id })
+      .where(eq(usuarios.id, usuarioAuth.id));
 
-    return NextResponse.json({ data: result[0] });
+    return NextResponse.json({ data: nuevaEmpresa });
   } catch (error) {
-    console.error("[PUT /api/empresa/perfil]", error);
-    return NextResponse.json(
-      { error: "Error al actualizar perfil de empresa" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error al crear empresa" }, { status: 500 });
   }
 }
 
-export async function GET(request: NextRequest) {
+// --- PUT: PARA EDITAR (Tu /perfil/edit) ---
+export async function PUT(request: NextRequest) {
   try {
-    const usuario = requireAuth(request);
-    if (usuario instanceof NextResponse) return usuario;
+    const usuarioAuth = requireAuth(request);
+    if (usuarioAuth instanceof NextResponse) return usuarioAuth;
 
-    if (!usuario.empresaId) {
-      return NextResponse.json(
-        { error: "El usuario no tiene una empresa asociada" },
-        { status: 400 }
-      );
+    if (!usuarioAuth.empresaId) {
+      return NextResponse.json({ error: "No tienes empresa que editar" }, { status: 400 });
     }
 
-    const result = await db
-      .select()
-      .from(empresas)
-      .where(eq(empresas.id, usuario.empresaId))
-      .limit(1);
+    const body = await request.json();
+    const { nombre, rubro, rut, direccion, comuna, telefono } = body;
 
-    if (result.length === 0) {
-      return NextResponse.json(
-        { error: "Empresa no encontrada" },
-        { status: 404 }
-      );
-    }
+    const [empresaActualizada] = await db.update(empresas)
+      .set({
+        nombre,
+        rubro,
+        rut,
+        direccion,
+        comuna,
+        telefono,
+      })
+      .where(eq(empresas.id, usuarioAuth.empresaId))
+      .returning();
 
-    return NextResponse.json({ data: result[0] });
+    return NextResponse.json({ data: empresaActualizada });
   } catch (error) {
-    console.error("[GET /api/empresa/perfil]", error);
-    return NextResponse.json(
-      { error: "Error al obtener perfil de empresa" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error al actualizar" }, { status: 500 });
   }
+}
+
+// --- GET: PARA CARGAR DATOS ---
+export async function GET(request: NextRequest) {
+  const usuarioAuth = requireAuth(request);
+  if (usuarioAuth instanceof NextResponse) return usuarioAuth;
+
+  if (!usuarioAuth.empresaId) return NextResponse.json({ data: null });
+
+  const [empresa] = await db.select().from(empresas).where(eq(empresas.id, usuarioAuth.empresaId)).limit(1);
+  return NextResponse.json({ data: empresa });
 }
