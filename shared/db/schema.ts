@@ -6,6 +6,7 @@ import {
   integer,
   timestamp,
   jsonb,
+  boolean,
   index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
@@ -72,6 +73,10 @@ export const analisis = pgTable(
     status: varchar("status", { length: 20 }).default("pending"),
     /** Almacena pymesData y productos extraídos del scraper */
     payloadData: jsonb("payload_data").notNull(),
+    /** Resultado del procesamiento con LLM (categorías y precios unitarios) */
+    payloadProcesado: jsonb("payload_procesado"),
+    /** Indica si el análisis ya fue procesado por el LLM */
+    procesado: boolean("procesado").default(false),
     fechaEjecucion: timestamp("fecha_ejecucion").defaultNow(),
   },
   (table) => ({
