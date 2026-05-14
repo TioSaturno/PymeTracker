@@ -72,3 +72,7 @@ shared/*/node_modules
 apps/*/.next
 apps/*/out
 apps/*/build
+
+# AGENTS config
+currentTask.md
+AGENTS.md

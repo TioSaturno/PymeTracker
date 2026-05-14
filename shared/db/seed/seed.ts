@@ -43,7 +43,7 @@ async function main() {
       .values({
         empresaId: empresa.id,
         nombre: "Marcos Admin",
-        email: "marcos@pymetracker.cl",
+        email: "admin@gmail.com",
         passwordHash: passwordHash,
         rol: "admin",
       })

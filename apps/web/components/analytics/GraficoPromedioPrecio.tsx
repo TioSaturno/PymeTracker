@@ -21,8 +21,8 @@ interface Props {
 export default function GraficoPromedioPrecio({ data }: Props) {
   if (!data || data.length === 0) {
     return (
-      <div className="flex-grow flex items-center justify-center bg-gray-50 h-full">
-        <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">
+      <div className="flex-grow flex items-center justify-center bg-[#f5f3f3]/30 h-full">
+        <p className="text-[#817470] font-semibold tracking-wider text-xs" style={{ fontFamily: "'Inter', sans-serif" }}>
           Sin datos
         </p>
       </div>
@@ -41,13 +41,19 @@ export default function GraficoPromedioPrecio({ data }: Props) {
             bottom: 80,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="nombre" tick={{ fontSize: 11 }} angle={-35} textAnchor="end" height={80} />
-          <YAxis tick={{ fontSize: 12 }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e4e2e2" />
+          <XAxis dataKey="nombre" tick={{ fontSize: 11, fill: "#4f4441" }} angle={-35} textAnchor="end" height={80} />
+          <YAxis tick={{ fontSize: 12, fill: "#4f4441" }} />
           <Tooltip
-            contentStyle={{ border: "2px solid black", borderRadius: 0 }}
+            contentStyle={{
+              border: "1px solid #e4e2e2",
+              borderRadius: "12px",
+              background: "rgba(255,255,255,0.9)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
+            }}
           />
-          <Bar dataKey="precioPromedio" fill="#000000" name="Precio Promedio" />
+          <Bar dataKey="precioPromedio" fill="#725950" name="Precio Promedio" radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>

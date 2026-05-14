@@ -43,17 +43,20 @@ function StarRating({ rating }: { rating: number }) {
             key={star}
             className={`text-[1.2em] ${
               filled
-                ? "text-[#f59e0b]"
+                ? "text-[#725950]"
                 : half
-                  ? "text-[#f59e0b] opacity-60"
-                  : "text-[#d1d5db]"
+                  ? "text-[#725950] opacity-60"
+                  : "text-[#d3c3be]"
             }`}
           >
             ★
           </span>
         );
       })}
-      <span className="ml-[0.4em] text-[0.85em] font-bold text-[#1a1b22]">
+      <span
+        className="ml-[0.4em] text-[0.85em] font-semibold text-[#1b1c1c]"
+        style={{ fontFamily: "'Inter', sans-serif" }}
+      >
         {rating.toFixed(1)}
       </span>
     </div>
@@ -69,7 +72,6 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
     return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
-  // Bloquear scroll del body cuando el modal está abierto
   useEffect(() => {
     if (empresa) {
       document.body.style.overflow = "hidden";
@@ -87,54 +89,54 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
 
   return (
     <div
-      className="fixed z-[50] flex items-center justify-center bg-[rgba(0,0,0,0.6)] p-[1em] w-[100%] h-[100%]"
+      className="fixed top-0 inset-0 z-[999] flex items-center justify-center bg-[rgba(27,28,28,0.3)] backdrop-blur-sm p-4 w-full h-full"
       onClick={onClose}
     >
       <div
-        className="bg-[#fbf8ff] border-2 border-[#1a1b22] w-[100%] max-w-[680px] max-h-[90vh] flex flex-col"
+        className="bg-white/90 backdrop-blur-xl border border-[#e4e2e2] rounded-2xl w-full max-w-[680px] max-h-[90vh] flex flex-col shadow-[0_20px_60px_rgba(0,0,0,0.12)]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Encabezado del modal */}
-        <div className="flex items-start justify-between border-b-2 border-[#1a1b22] p-[1.25em]">
+        <div className="flex items-start justify-between border-b border-[#e4e2e2] p-5">
           <div>
-            <p className="text-[0.65em] font-black uppercase tracking-[0.2em] text-[#666] mb-[0.3em]">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-1">
               DETALLE DE COMPETENCIA
             </p>
-            <h2 className="text-[1.4em] font-black uppercase leading-tight text-[#1a1b22] m-0">
+            <h2
+              className="text-xl font-semibold leading-tight text-[#1b1c1c]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            >
               {empresa.nombre}
             </h2>
-            <div className="mt-[0.5em]">
+            <div className="mt-2">
               <StarRating rating={calificaciones.rating} />
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-[1.5em] font-black leading-none text-[#1a1b22] hover:bg-[#1a1b22] hover:text-[#ffffff] transition-colors w-[1.6em] h-[1.6em] flex items-center justify-center border-[2px] border-[#1a1b22] flex-shrink-0"
+            className="text-xl font-semibold leading-none text-[#4f4441] hover:bg-[#f5f3f3] hover:text-[#1b1c1c] transition-colors w-10 h-10 flex items-center justify-center border border-[#e4e2e2] rounded-xl flex-shrink-0 cursor-pointer"
             aria-label="Cerrar modal"
           >
             ×
           </button>
         </div>
 
-        {/* Cuerpo scrollable */}
         <div className="overflow-y-auto flex-1">
-          {/* Info general */}
-          <div className="p-[1.25em] border-b-2 border-[#1a1b22] grid grid-cols-2 gap-[1em]">
+          <div className="p-5 border-b border-[#e4e2e2] grid grid-cols-2 gap-4">
             <div>
-              <p className="text-[0.65em] font-black uppercase tracking-[0.15em] text-[#666] mb-[0.25em]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-1">
                 UBICACIÓN
               </p>
               <a
                 href={empresa.google_maps_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[0.85em] font-bold text-[#1a1b22] underline hover:text-[#f59e0b] transition-colors"
+                className="text-sm font-medium text-[#1b1c1c] hover:text-[#725950] transition-colors"
               >
                 📍 {empresa.ubicacion}
               </a>
             </div>
             <div>
-              <p className="text-[0.65em] font-black uppercase tracking-[0.15em] text-[#666] mb-[0.25em]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-1">
                 SITIO WEB
               </p>
               {empresa.sitio_web ? (
@@ -142,27 +144,27 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
                   href={empresa.sitio_web}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[0.85em] font-bold text-[#1a1b22] underline hover:text-[#f59e0b] transition-colors"
+                  className="text-sm font-medium text-[#1b1c1c] hover:text-[#725950] transition-colors"
                 >
                   {empresa.sitio_web.replace(/^https?:\/\//, "")}
                 </a>
               ) : (
-                <span className="text-[0.85em] text-[#999]">No disponible</span>
+                <span className="text-sm text-[#817470]">No disponible</span>
               )}
             </div>
             <div>
-              <p className="text-[0.65em] font-black uppercase tracking-[0.15em] text-[#666] mb-[0.25em]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-1">
                 RESEÑAS TOTALES
               </p>
-              <span className="text-[0.85em] font-bold text-[#1a1b22]">
+              <span className="text-sm font-semibold text-[#1b1c1c]">
                 {calificaciones.total_resenas.toLocaleString("es-CL")} reseñas
               </span>
             </div>
             <div>
-              <p className="text-[0.65em] font-black uppercase tracking-[0.15em] text-[#666] mb-[0.25em]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-1">
                 RANGO DE PRECIOS
               </p>
-              <span className="text-[0.85em] font-bold text-[#1a1b22]">
+              <span className="text-sm font-semibold text-[#1b1c1c]">
                 {calificaciones.rango_precio_gmaps === "No especificado"
                   ? "—"
                   : calificaciones.rango_precio_gmaps}
@@ -170,22 +172,21 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
             </div>
           </div>
 
-          {/* Precios */}
           {precios && precios.length > 0 && (
-            <div className="p-[1.25em] border-b-2 border-[#1a1b22]">
-              <p className="text-[0.65em] font-black uppercase tracking-[0.15em] text-[#666] mb-[0.75em]">
+            <div className="p-5 border-b border-[#e4e2e2]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-3">
                 LISTA DE PRECIOS
               </p>
-              <div className="grid grid-cols-1 gap-[0.4em]">
+              <div className="grid grid-cols-1 gap-2">
                 {precios.map((item, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between border border-[#1a1b22] px-[0.75em] py-[0.5em]"
+                    className="flex items-center justify-between border border-[#e4e2e2] rounded-xl px-4 py-3 bg-[#f5f3f3]/30"
                   >
-                    <span className="text-[0.82em] font-bold text-[#1a1b22] uppercase">
+                    <span className="text-sm font-semibold text-[#1b1c1c] uppercase">
                       {item.producto}
                     </span>
-                    <span className="text-[0.82em] font-black text-[#1a1b22] ml-[1em] whitespace-nowrap">
+                    <span className="text-sm font-bold text-[#725950] ml-4 whitespace-nowrap">
                       ${item.precio.toLocaleString("es-CL")}
                     </span>
                   </div>
@@ -194,21 +195,20 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
             </div>
           )}
 
-          {/* Opiniones scrollables */}
-          <div className="p-[1.25em]">
-            <p className="text-[0.65em] font-black uppercase tracking-[0.15em] text-[#666] mb-[0.75em]">
+          <div className="p-5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-3">
               ÚLTIMAS OPINIONES ({calificaciones.ultimas_resenas.length})
             </p>
-            <div className="flex flex-col gap-[0.75em] max-h-[260px] overflow-y-auto pr-[0.25em]">
+            <div className="flex flex-col gap-3 max-h-[260px] overflow-y-auto pr-1">
               {calificaciones.ultimas_resenas.map((resena, i) => (
                 <div
                   key={i}
-                  className="border-2 border-[#1a1b22] p-[0.875em] bg-[#fbf8ff]"
+                  className="border border-[#e4e2e2] rounded-xl p-4 bg-[#f5f3f3]/30"
                 >
-                  <p className="text-[0.65em] font-black uppercase tracking-[0.1em] text-[#666] mb-[0.4em]">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-2">
                     RESEÑA #{i + 1}
                   </p>
-                  <p className="text-[0.82em] text-[#1a1b22] leading-relaxed m-0">
+                  <p className="text-sm text-[#1b1c1c] leading-relaxed m-0">
                     {resena}
                   </p>
                 </div>
@@ -217,19 +217,18 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t-2 border-[#1a1b22] p-[1em] flex gap-[0.75em]">
+        <div className="border-t border-[#e4e2e2] p-4 flex gap-3">
           <a
             href={empresa.google_maps_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 text-center py-[0.75em] bg-[#1a1b22] text-[#ffffff] text-[0.75em] font-black uppercase tracking-[0.1em] hover:bg-[#ffffff] hover:text-[#1a1b22] border-[2px] border-[#1a1b22] transition-colors"
+            className="flex-1 text-center py-3 bg-[#725950] text-white text-xs font-semibold uppercase tracking-wider hover:bg-[#5d4a42] border border-[#725950] rounded-xl transition-all duration-200"
           >
             VER EN GOOGLE MAPS
           </a>
           <button
             onClick={onClose}
-            className="flex-1 py-[0.75em] bg-[#ffffff] text-[#1a1b22] text-[0.75em] font-black uppercase tracking-[0.1em] border-[2px] border-[#1a1b22] hover:bg-[#1a1b22] hover:text-[#ffffff] transition-colors"
+            className="flex-1 py-3 bg-white text-[#1b1c1c] text-xs font-semibold uppercase tracking-wider border border-[#e4e2e2] hover:bg-[#f5f3f3] rounded-xl transition-all duration-200 cursor-pointer"
           >
             CERRAR
           </button>

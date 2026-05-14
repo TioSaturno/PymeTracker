@@ -16,10 +16,10 @@ function StarRating({ rating }: { rating: number }) {
             key={star}
             className={`text-[1em] ${
               filled
-                ? "text-[#f59e0b]"
+                ? "text-[#725950]"
                 : half
-                  ? "text-[#f59e0b] opacity-50"
-                  : "text-[#d1d5db]"
+                  ? "text-[#725950] opacity-50"
+                  : "text-[#d3c3be]"
             }`}
           >
             ★
@@ -37,62 +37,65 @@ function EmpresaCard({
   empresa: Empresa;
   onClick: () => void;
 }) {
+  const handleCardClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'A' || target.closest('a')) {
+      return;
+    }
+    onClick();
+  };
+
   return (
-    <button
-      onClick={onClick}
-      className="w-[100%] text-left bg-[#ffffff] border-[2px] border-[#1a1b22] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] transition-all duration-[150ms] p-[1.25em] flex items-start justify-between gap-[1em] group cursor-pointer"
+    <div
+      onClick={handleCardClick}
+      className="w-full text-left bg-white/80 backdrop-blur-xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 rounded-2xl hover:shadow-[0_4px_16px_rgb(0,0,0,0.06)] transition-all duration-200 p-5 flex items-start justify-between gap-4 group cursor-pointer shadow-[0_4px_16px_rgb(0,0,0,0.03)]"
     >
-      {/* Info izquierda */}
       <div className="flex-1 min-w-0">
-        <p className="text-[0.6em] font-black uppercase tracking-[0.2em] text-[#666] mb-[0.25em]">
+        <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-1">
           {empresa._meta?.busqueda?.tema ?? "NEGOCIO"}
         </p>
-        <h3 className="text-[1em] font-black uppercase text-[#1a1b22] m-0 leading-tight truncate group-hover:underline">
+        <h3 className="text-base font-semibold text-[#1b1c1c] leading-tight truncate group-hover:text-[#725950] transition-colors" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           {empresa.nombre}
         </h3>
 
-        {/* Ubicación clicable separado */}
         <a
           href={empresa.google_maps_url}
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="mt-[0.5em] text-[0.75em] font-bold text-[#1a1b22] underline hover:text-[#f59e0b] transition-colors flex items-center gap-[0.3em] w-fit"
+          className="mt-2 text-sm font-medium text-[#4f4441] hover:text-[#725950] transition-colors flex items-center gap-1 w-fit"
         >
           <span>📍</span>
           <span className="truncate max-w-[280px]">{empresa.ubicacion}</span>
         </a>
 
-        {/* Badges */}
-        <div className="flex flex-wrap gap-[0.4em] mt-[0.75em]">
-          <span className="text-[0.65em] font-black uppercase tracking-[0.1em] border border-[#1a1b22] px-[0.5em] py-[0.2em] bg-[#fbf8ff]">
-            {empresa.calificaciones.total_resenas.toLocaleString("es-CL")}{" "}
-            reseñas
+        <div className="flex flex-wrap gap-2 mt-3">
+          <span className="text-xs font-semibold border border-[#e4e2e2] px-2.5 py-1 bg-[#f5f3f3]/50 text-[#4f4441] rounded-full">
+            {empresa.calificaciones.total_resenas.toLocaleString("es-CL")} reseñas
           </span>
           {empresa.calificaciones.rango_precio_gmaps !== "No especificado" && (
-            <span className="text-[0.65em] font-black uppercase tracking-[0.1em] border-[1px] border-[#1a1b22] px-[0.5em] py-[0.2em] bg-[#1a1b22] text-[#ffffff]">
+            <span className="text-xs font-semibold border border-[#e4e2e2] px-2.5 py-1 bg-[#725950] text-white rounded-full">
               {empresa.calificaciones.rango_precio_gmaps}
             </span>
           )}
           {empresa.precios && empresa.precios.length > 0 && (
-            <span className="text-[0.65em] font-black uppercase tracking-[0.1em] border border-[#f59e0b] px-[0.5em] py-[0.2em] bg-[#fef3c7] text-[#92400e]">
+            <span className="text-xs font-semibold border border-[#fedcd0] px-2.5 py-1 bg-[#fedcd0]/30 text-[#725950] rounded-full">
               {empresa.precios.length} PRECIOS
             </span>
           )}
         </div>
       </div>
 
-      {/* Rating derecho */}
-      <div className="flex flex-col items-center flex-shrink-0 border-2 border-[#1a1b22] p-[0.75em] min-w-[5em]">
-        <span className="text-[1.8em] font-black text-[#1a1b22] leading-none">
+      <div className="flex flex-col items-center flex-shrink-0 border border-[#e4e2e2] rounded-xl p-3 min-w-[5em] bg-[#f5f3f3]/30">
+        <span className="text-2xl font-bold text-[#1b1c1c]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
           {empresa.calificaciones.rating.toFixed(1)}
         </span>
         <StarRating rating={empresa.calificaciones.rating} />
-        <span className="text-[0.55em] uppercase font-black tracking-[0.1em] text-[#666] mt-[0.2em]">
+        <span className="text-xs uppercase font-semibold tracking-wider text-[#817470] mt-1">
           / 5.0
         </span>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -109,7 +112,6 @@ export default function Competencia() {
   useEffect(() => {
     const fetchCompetencia = async () => {
       try {
-        // el id del user y la tienda estan hardcodeados por ahora
         const res = await fetch("/api/competencia?userId=1&tiendaId=1");
         if (!res.ok) throw new Error("Error al obtener datos");
         const data = await res.json();
@@ -140,27 +142,23 @@ export default function Competencia() {
         ).toFixed(1)
       : "—";
 
-  console.log(empresas);
-
   return (
     <>
-      <main className="min-h-[100vh] bg-[#fbf8ff] font-['Inter',sans-serif]">
-        {/* Header */}
-        <div className="border-b-[2px] border-[#1a1b22] bg-[#ffffff] px-[2em] py-[1.5em]">
-          <p className="text-[0.65em] font-black uppercase tracking-[0.25em] text-[#666] m-0">
+      <main className="min-h-screen bg-[#fbf9f8]" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <div className="border-b border-[#e4e2e2] bg-white/60 backdrop-blur-xl px-8 py-6">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[#817470] m-0">
             PYMETRACKER
           </p>
-          <h1 className="text-[2em] font-black uppercase text-[#1a1b22] m-0 leading-tight">
+          <h1 className="text-3xl font-semibold text-[#1b1c1c] leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             ANÁLISIS DE
             <br />
             COMPETENCIA
           </h1>
         </div>
 
-        <div className="max-w-[860px] mx-auto px-[1.5em] py-[2em]">
-          {/* Métricas summary */}
+        <div className="max-w-[860px] mx-auto px-6 py-8">
           {!loading && !error && empresas.length > 0 && (
-            <div className="grid grid-cols-3 gap-[1em] mb-[2em]">
+            <div className="grid grid-cols-3 gap-4 mb-8">
               {[
                 { label: "COMPETIDORES", value: empresas.length.toString() },
                 { label: "RATING PROMEDIO", value: promedioRating },
@@ -173,12 +171,12 @@ export default function Competencia() {
               ].map((stat) => (
                 <div
                   key={stat.label}
-                  className="bg-[#ffffff] border-[2px] border-[#1a1b22] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-[1em] text-center"
+                  className="bg-white/80 backdrop-blur-xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 rounded-2xl p-4 text-center shadow-[0_4px_16px_rgb(0,0,0,0.03)]"
                 >
-                  <p className="text-[0.6em] font-black uppercase tracking-[0.15em] text-[#666] m-0 mb-[0.25em]">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] m-0 mb-1">
                     {stat.label}
                   </p>
-                  <p className="text-[2em] font-black text-[#1a1b22] m-0 leading-tight">
+                  <p className="text-2xl font-bold text-[#1b1c1c]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                     {stat.value}
                   </p>
                 </div>
@@ -186,12 +184,11 @@ export default function Competencia() {
             </div>
           )}
 
-          {/* Buscador + Ordenar */}
-          <div className="flex gap-[1em] mb-[1.5em] items-end">
+          <div className="flex gap-4 mb-6 items-end">
             <div className="flex-1">
               <label
                 htmlFor="search-competencia"
-                className="block text-[0.65em] font-black uppercase tracking-[0.2em] text-[#666] mb-[0.4em]"
+                className="block text-xs font-semibold uppercase tracking-wider text-[#817470] mb-2"
               >
                 BUSCAR NEGOCIO
               </label>
@@ -201,13 +198,13 @@ export default function Competencia() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Ej: Sushi, Bamboo..."
-                className="w-[70%] border-[2px] border-[#1a1b22] px-[1em] py-[0.75em] text-[0.9em] font-bold text-[#1a1b22] bg-[#ffffff] outline-none placeholder:text-[#aaa] placeholder:font-normal"
+                className="w-[70%] border border-[#e4e2e2] rounded-xl px-4 py-3 text-sm font-medium text-[#1b1c1c] bg-white/80 backdrop-blur-xl outline-none placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/20 transition-all duration-200"
               />
             </div>
             <div className="min-w-[11em]">
               <label
                 htmlFor="sort-competencia"
-                className="block text-[0.65em] font-black uppercase tracking-[0.2em] text-[#666] mb-[0.4em]"
+                className="block text-xs font-semibold uppercase tracking-wider text-[#817470] mb-2"
               >
                 ORDENAR POR
               </label>
@@ -217,7 +214,7 @@ export default function Competencia() {
                 onChange={(e) =>
                   setSortBy(e.target.value as "opiniones" | "valoracion")
                 }
-                className="w-[100%] border-[2px] border-[#1a1b22] px-[0.75em] py-[0.75em] text-[0.85em] font-bold text-[#1a1b22] bg-[#ffffff] outline-none cursor-pointer appearance-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow"
+                className="w-full border border-[#e4e2e2] rounded-xl px-3 py-3 text-sm font-medium text-[#1b1c1c] bg-white/80 backdrop-blur-xl outline-none cursor-pointer focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/20 transition-all duration-200"
               >
                 <option value="valoracion">Mejor valorado</option>
                 <option value="opiniones">Más opiniones</option>
@@ -225,37 +222,34 @@ export default function Competencia() {
             </div>
           </div>
 
-          {/* Estado: loading */}
           {loading && (
-            <div className="flex flex-col gap-[1em]">
-              <p className="text-[0.9em] font-bold text-[#1a1b22] m-0">
+            <div className="flex flex-col gap-4">
+              <p className="text-sm font-medium text-[#4f4441]">
                 Cargando competencia...
               </p>
             </div>
           )}
 
-          {/* Estado: error */}
           {!loading && error && (
-            <div className="border-[2px] border-[#ef4444] bg-[#ffffff] shadow-[4px_4px_0px_0px_rgba(239,68,68,1)] p-[1.5em]">
-              <p className="text-[0.65em] font-black uppercase tracking-[0.2em] text-[#ef4444] m-0 mb-[0.3em]">
+            <div className="border border-[#ffdad6] bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-[0_4px_16px_rgb(186,26,26,0.03)]">
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#ba1a1a] m-0 mb-1">
                 ERROR
               </p>
-              <p className="text-[0.9em] font-bold text-[#1a1b22] m-0">
+              <p className="text-sm font-medium text-[#1b1c1c]">
                 {error}
               </p>
             </div>
           )}
 
-          {/* Estado: sin resultados */}
           {!loading && !error && filtradas.length === 0 && (
-            <div className="border-[2px] border-[#1a1b22] bg-[#ffffff] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-[2em] text-center">
-              <p className="text-[2em] m-0">🔍</p>
-              <p className="text-[0.65em] font-black uppercase tracking-[0.2em] text-[#666] mt-[0.5em] m-0">
+            <div className="border border-[#e4e2e2] bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
+              <p className="text-2xl m-0">🔍</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mt-2 m-0">
                 {empresas.length === 0
                   ? "SIN DATOS DISPONIBLES"
                   : "SIN RESULTADOS"}
               </p>
-              <p className="text-[0.85em] text-[#666] mt-[0.5em] m-0">
+              <p className="text-sm text-[#4f4441] mt-2 m-0">
                 {empresas.length === 0
                   ? "No se encontró información de competencia para esta tienda."
                   : `No hay negocios que coincidan con "${search}".`}
@@ -263,9 +257,8 @@ export default function Competencia() {
             </div>
           )}
 
-          {/* Lista de empresas */}
           {!loading && !error && filtradas.length > 0 && (
-            <div className="flex flex-col gap-[1em]">
+            <div className="flex flex-col gap-4">
               {filtradas.map((empresa, i) => (
                 <EmpresaCard
                   key={i}
@@ -277,7 +270,6 @@ export default function Competencia() {
           )}
         </div>
       </main>
-      {/* Modal */}
       <ModalEmpresa empresa={selected} onClose={() => setSelected(null)} />
     </>
   );

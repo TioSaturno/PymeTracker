@@ -6,7 +6,7 @@ import { requireAuth } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
-    const usuario = requireAuth(request);
+    const usuario = await requireAuth(request);
     if (usuario instanceof NextResponse) return usuario;
 
     const body = await request.json();
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const usuario = requireAuth(request);
+    const usuario = await requireAuth(request);
     if (usuario instanceof NextResponse) return usuario;
 
     const { searchParams } = new URL(request.url);

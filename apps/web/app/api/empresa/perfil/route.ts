@@ -6,7 +6,7 @@ import { requireAuth } from "@/lib/auth";
 
 export async function PUT(request: NextRequest) {
   try {
-    const usuario = requireAuth(request);
+    const usuario = await requireAuth(request);
     if (usuario instanceof NextResponse) return usuario;
 
     if (!usuario.empresaId) {
@@ -54,7 +54,7 @@ export async function PUT(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const usuario = requireAuth(request);
+    const usuario = await requireAuth(request);
     if (usuario instanceof NextResponse) return usuario;
 
     if (!usuario.empresaId) {

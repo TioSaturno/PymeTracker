@@ -6,7 +6,7 @@ import { requireAuth } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
     try {
-        const usuario = requireAuth(request);
+        const usuario = await requireAuth(request);
         if (usuario instanceof NextResponse) return usuario;
 
         const ejecuciones = await db.select()
