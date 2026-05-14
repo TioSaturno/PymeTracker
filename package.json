@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "description": "PymeTracker monorepo — web app + scraping service",
   "private": true,
+  "packageManager": "npm@11.6.2",
   "workspaces": [
     "apps/*",
     "shared/*"
   ],
   "scripts": {
-    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:web": "NEXT_IGNORE_INCORRECT_LOCKFILE=1 npm run dev --workspace=apps/web",
     "scraper:pipeline": "npm run run:pipeline --workspace=apps/scraping",
     "build:web": "npm run build --workspace=apps/web",
     "db:local": "docker compose -f shared/db/docker-compose.yml up -d",
