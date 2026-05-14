@@ -12,7 +12,7 @@ node_modules
 out/
 build
 
-# Environment files
+# Environment files (¡ESTO ES VITAL!)
 .env
 .env.local
 .env.development.local
@@ -28,7 +28,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# Database
+# Database & Docker
 shared/db/postgres_data/
 
 # TypeScript
@@ -43,30 +43,12 @@ coverage/
 .nyc_output/
 
 # IDE / Editor
-node_modules/
-.next/
-.env
-.env.local
-.env.*.local
-dist/
-build/
-.next/
-*.tsbuildinfo
-
-# Docker / DB
-shared/db/postgres_data/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# IDE
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Monorepo specific (just in case)
+# Monorepo (Turbo/pnpm/npm workspaces)
 apps/*/node_modules
 shared/*/node_modules
 apps/*/.next

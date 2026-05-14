@@ -1,15 +1,32 @@
 @import "tailwindcss";
 
-body {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    background-color: #fbf8ff;
-    color: #1a1b22;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+/* Estilos Globales de Avril */
+@layer base {
+  body {
+    background-color: #f7f9fb;
+    color: #191c1e;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
+/* Iconos de Material Symbols (¡Vital para tu diseño!) */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Estilos de Tarjetas (Necesarios para el Login/Registro de los chicos) */
 .contenedor-principal {
     flex-grow: 1;
     display: flex;

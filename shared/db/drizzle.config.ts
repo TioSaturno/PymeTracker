@@ -5,8 +5,6 @@ export default defineConfig({
   schema: "./schema.ts",
   out: "./migrations",
   dbCredentials: {
-    url:
-      process.env.DATABASE_URL ??
-      "postgres://loky:loky@localhost:5432/IngSoft",
+    url: "postgres://pymeadmin:liter%40lvin123@pymetracker-db.postgres.database.azure.com:5432/postgres?sslmode=require",
   },
 });

@@ -29,5 +29,17 @@
   "bugs": {
     "url": "https://github.com/TioSaturno/PymeTracker/issues"
   },
-  "homepage": "https://github.com/TioSaturno/PymeTracker#readme"
+  "homepage": "https://github.com/TioSaturno/PymeTracker#readme",
+  "dependencies": {
+    "@esbuild/darwin-x64": "^0.28.0",
+    "@tailwindcss/postcss": "^4.2.4",
+    "autoprefixer": "^10.5.0",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
+    "postcss": "^8.5.14"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10"
+  }
 }
