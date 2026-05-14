@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "PymeTracker monorepo — web app + scraping service",
   "private": true,
+  "packageManager": "npm@11.6.2",
   "workspaces": [
     "apps/*",
     "shared/*"
