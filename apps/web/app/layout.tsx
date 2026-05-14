@@ -1,4 +1,3 @@
-// apps/web/app/layout.tsx
 import "./globals.css";
 import type { Metadata } from "next";
 
@@ -13,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className="light">
+    <html lang="es" className="light h-full">
       <head>
         {/* Google Fonts: Inter para el texto y Material Symbols para los iconos */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,7 +26,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" 
         />
       </head>
-      <body className="antialiased">
+      <body className="min-h-full flex flex-col antialiased">
         {children}
       </body>
     </html>

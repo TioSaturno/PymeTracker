@@ -4,7 +4,7 @@ const config: Config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
-    "../../shared/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "../../shared/components/**/*.{js,ts,jsx,tsx,mdx}", // Mantén esto que es de tu rama
   ],
   theme: {
     extend: {
