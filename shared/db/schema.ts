@@ -16,8 +16,12 @@ import { relations } from "drizzle-orm";
 // ─────────────────────────────────────────────
 export const empresas = pgTable("empresas", {
   id: serial("id").primaryKey(),
+  rut: varchar("rut", { length: 20 }),
   nombre: varchar("nombre", { length: 255 }).notNull(),
   rubro: varchar("rubro", { length: 100 }),
+  direccion: text("direccion"),
+  comuna: varchar("comuna", { length: 100 }),
+  telefono: varchar("telefono", { length: 50 }),
   fechaRegistro: timestamp("fecha_registro").defaultNow(),
 });
 
@@ -78,6 +82,7 @@ export const analisis = pgTable(
     /** Indica si el análisis ya fue procesado por el LLM */
     procesado: boolean("procesado").default(false),
     fechaEjecucion: timestamp("fecha_ejecucion").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
   },
   (table) => ({
     // Índice GIN para búsquedas rápidas dentro del JSONB

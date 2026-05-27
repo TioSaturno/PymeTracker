@@ -31,7 +31,11 @@ async function main() {
       .insert(schema.empresas)
       .values({
         nombre: "Sushi Master",
-        rubro: "Gastronomía",
+        rubro: "Sushi",
+        rut: "76.543.210-K",
+        direccion: "Providencia 1234",
+        comuna: "Providencia",
+        telefono: "+56912345678",
       })
       .returning();
 
