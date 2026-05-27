@@ -10,6 +10,8 @@
   ],
   "scripts": {
     "dev:web": "cross-env NEXT_IGNORE_INCORRECT_LOCKFILE=1 npm run dev --workspace=apps/web",
+    "dev:scraper": "npm run start:server --workspace=apps/scraping",
+    "dev:all": "concurrently --kill-others -n db,web,scraper \"docker compose -f shared/db/docker-compose.yml up\" \"npm run dev:web\" \"npm run dev:scraper\"",
     "scraper:pipeline": "npm run run:pipeline --workspace=apps/scraping",
     "build:web": "npm run build --workspace=apps/web",
     "db:local": "docker compose -f shared/db/docker-compose.yml up -d",
@@ -34,6 +36,7 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "concurrently": "^9.2.1",
     "cross-env": "^10.1.0",
     "esbuild": "^0.28.0"
   },
