@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "run:places": "tsx ./src/scrapers/scraper-maps.ts",
     "run:scraper": "tsx ./src/scrapers/scraper.ts",
+    "start:server": "tsx ./src/server.ts",
     "run:pipeline": "tsx ./src/pipeline.ts"
   },
   "keywords": [],
@@ -14,16 +15,18 @@
   "license": "ISC",
   "packageManager": "pnpm@10.28.0",
   "dependencies": {
+    "@fastify/cors": "^11.2.0",
     "@google/generative-ai": "^0.24.1",
     "@googlemaps/google-maps-services-js": "^3.4.2",
     "@libsql/client": "^0.17.0",
+    "@pymetracker/db": "*",
     "dotenv": "^17.3.1",
     "drizzle-orm": "^0.45.1",
+    "fastify": "^5.8.5",
     "openai": "^6.27.0",
     "playwright": "^1.58.2",
     "playwright-extra": "^4.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "@pymetracker/db": "*"
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   },
   "devDependencies": {
     "@types/node": "^25.4.0",
