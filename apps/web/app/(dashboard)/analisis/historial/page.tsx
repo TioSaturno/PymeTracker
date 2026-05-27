@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import PageHeader from "@/app/components/PageHeader";
+import EjecutarAnalisis from "@/components/EjecutarAnalisis";
 
 interface Busqueda {
   tema: string;
@@ -102,18 +104,11 @@ export default function HistorialPage() {
 
   return (
     <div className="min-h-screen bg-[#fbf9f8]" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <div className="border-b border-[#e4e2e2] bg-white/60 backdrop-blur-xl px-8 py-6">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#817470] m-0">
-          PYMETRACKER
-        </p>
-        <h1 className="text-3xl font-semibold text-[#1b1c1c] leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-          HISTORIAL DE
-          <br />
-          ANÁLISIS
-        </h1>
-      </div>
+      <PageHeader pageTitle={<>HISTORIAL DE<br/>ANÁLISIS</>} />
 
       <main className="flex-grow flex flex-col items-center p-8 w-full max-w-4xl mx-auto gap-6">
+        <EjecutarAnalisis />
+
         {loading ? (
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] w-full p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-center font-semibold text-[#4f4441]">
             Cargando historial...

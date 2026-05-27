@@ -1,44 +1,57 @@
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pymeTracker/db/create-client";
-import { analisis } from "@pymeTracker/db/schema";
-import { eq, and } from "drizzle-orm";
+import { analisis, tiendas } from "@pymeTracker/db/schema";
+import { eq, and, desc } from "drizzle-orm";
+import { requireAuth } from "@/lib/auth";
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url);
+export async function GET(request: NextRequest) {
+  try {
+    const usuario = await requireAuth(request);
+    if (usuario instanceof NextResponse) return usuario;
 
-  const userId = searchParams.get("userId");
-  const tiendaId = searchParams.get("tiendaId");
+    const { searchParams } = new URL(request.url);
+    let tiendaId = searchParams.get("tiendaId");
 
-  if (!userId || !tiendaId) {
-    return Response.json(
-      { error: "userId y tiendaId son requeridos" },
-      { status: 400 },
-    );
-  }
+    if (!tiendaId && usuario.empresaId) {
+      const [firstTienda] = await db
+        .select({ id: tiendas.id })
+        .from(tiendas)
+        .where(eq(tiendas.empresaId, usuario.empresaId))
+        .limit(1);
+      if (firstTienda) tiendaId = String(firstTienda.id);
+    }
 
-  // Traemos todos los análisis que coincidan con la tienda y el usuario
-  const rows = await db
-    .select({
-      analisisId: analisis.id,
-      status: analisis.status,
-      fechaEjecucion: analisis.fechaEjecucion,
-      payload: analisis.payloadData,
-    })
-    .from(analisis)
-    .where(
-      and(
-        eq(analisis.tiendaId, Number(tiendaId)),
-        eq(analisis.usuarioId, Number(userId)),
-      ),
-    )
-    .orderBy(analisis.fechaEjecucion);
+    if (!tiendaId) {
+      return NextResponse.json(
+        { error: "No se encontró una tienda asociada" },
+        { status: 400 },
+      );
+    }
 
-  if (!rows.length) {
-    return Response.json({ empresas: [], total: 0 });
-  }
+    // Solo la última ejecución
+    const [latest] = await db
+      .select({
+        id: analisis.id,
+        status: analisis.status,
+        fechaEjecucion: analisis.fechaEjecucion,
+        payload: analisis.payloadData,
+      })
+      .from(analisis)
+      .where(
+        and(
+          eq(analisis.tiendaId, Number(tiendaId)),
+          eq(analisis.usuarioId, usuario.id),
+          eq(analisis.status, "completed"),
+        ),
+      )
+      .orderBy(desc(analisis.fechaEjecucion))
+      .limit(1);
 
-  // Aplanamos los arrays de empresas de cada payload en uno solo
-  const empresas = rows.flatMap((row) => {
-    const payload = row.payload as {
+    if (!latest) {
+      return NextResponse.json({ empresas: [], total: 0 });
+    }
+
+    const payload = latest.payload as {
       empresas: Array<Record<string, unknown>>;
       busqueda: { tema: string; ubicacion: string };
       fecha: string;
@@ -47,21 +60,27 @@ export async function GET(req: Request) {
       mas_criticado: string | null;
     };
 
-    // Enriquecemos cada empresa con metadata del análisis
-    return (payload.empresas ?? []).map((empresa) => ({
+    // Excluimos el primer elemento (negocio propio)
+    const competidores = (payload.empresas ?? []).slice(1).map((empresa) => ({
       ...empresa,
       _meta: {
-        analisisId: row.analisisId,
-        status: row.status,
-        fechaEjecucion: row.fechaEjecucion,
+        analisisId: latest.id,
+        status: latest.status,
+        fechaEjecucion: latest.fechaEjecucion,
         busqueda: payload.busqueda,
         fecha: payload.fecha,
       },
     }));
-  });
 
-  return Response.json({
-    empresas,
-    total: empresas.length,
-  });
+    return NextResponse.json({
+      empresas: competidores,
+      total: competidores.length,
+    });
+  } catch (error) {
+    console.error("Error fetching competencia:", error);
+    return NextResponse.json(
+      { error: "Error al cargar competencia" },
+      { status: 500 },
+    );
+  }
 }

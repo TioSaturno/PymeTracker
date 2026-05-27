@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import GraficoPromedioPrecio from "@/components/analytics/GraficoPromedioPrecio";
 import GraficoComparativaProductos from "@/components/analytics/GraficoComparativaProductos";
 import GraficoComposicionOferta from "@/components/analytics/GraficoComposicionOferta";
+import PageHeader from "@/app/components/PageHeader";
 import GraficoEvolucionPrecio from "@/components/analytics/GraficoEvolucionPrecio";
 
 export default function AnalisisPage() {
@@ -45,16 +46,7 @@ export default function AnalisisPage() {
 
   return (
     <div className="min-h-screen bg-[#fbf9f8]" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <div className="border-b border-[#e4e2e2] bg-white/60 backdrop-blur-xl px-8 py-6">
-        <p className="text-xs font-semibold uppercase tracking-widest text-[#817470] m-0">
-          PYMETRACKER
-        </p>
-        <h1 className="text-3xl font-semibold text-[#1b1c1c] leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-          GRÁFICAS Y
-          <br />
-          ANÁLISIS
-        </h1>
-      </div>
+      <PageHeader pageTitle={<>GRÁFICAS Y<br/>ANÁLISIS</>} />
 
       <main className="flex-grow flex flex-col items-center p-8 w-full max-w-6xl mx-auto gap-8">
         {loading ? (
