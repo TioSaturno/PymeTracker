@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import PageHeader from "@/app/components/PageHeader";
 import ModalEmpresa, {
   type Empresa,
 } from "@/app/components/competencia/ModalEmpresa";
@@ -112,7 +113,24 @@ export default function Competencia() {
   useEffect(() => {
     const fetchCompetencia = async () => {
       try {
-        const res = await fetch("/api/competencia?userId=1&tiendaId=1");
+        const perfilRes = await fetch("/api/empresa/perfil");
+        let tiendaId: number | null = null;
+
+        if (perfilRes.ok) {
+          const perfilJson = await perfilRes.json();
+          const tiendas = perfilJson.data?.tiendas;
+          if (tiendas && tiendas.length > 0) {
+            tiendaId = tiendas[0].id;
+          }
+        }
+
+        if (!tiendaId) {
+          setError("No se encontró una tienda asociada a tu cuenta.");
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`/api/competencia?tiendaId=${tiendaId}`);
         if (!res.ok) throw new Error("Error al obtener datos");
         const data = await res.json();
         setEmpresas(data.empresas ?? []);
@@ -145,16 +163,7 @@ export default function Competencia() {
   return (
     <>
       <main className="min-h-screen bg-[#fbf9f8]" style={{ fontFamily: "'Inter', sans-serif" }}>
-        <div className="border-b border-[#e4e2e2] bg-white/60 backdrop-blur-xl px-8 py-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-[#817470] m-0">
-            PYMETRACKER
-          </p>
-          <h1 className="text-3xl font-semibold text-[#1b1c1c] leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            ANÁLISIS DE
-            <br />
-            COMPETENCIA
-          </h1>
-        </div>
+      <PageHeader pageTitle={<>ANÁLISIS DE<br/>COMPETENCIA</>} />
 
         <div className="max-w-[860px] mx-auto px-6 py-8">
           {!loading && !error && empresas.length > 0 && (

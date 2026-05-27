@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import PageHeader from "@/app/components/PageHeader";
 
 export default function DashboardPage() {
   const [datos, setDatos] = useState<any>(null);
@@ -95,28 +96,23 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#fbf9f8] flex flex-col" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <main className="flex-1 p-8 bg-[#fbf9f8]">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h2 className="text-2xl font-semibold text-[#1b1c1c]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                Análisis de {miNegocio.nombre}
-              </h2>
-              <p className="text-[#4f4441] text-sm italic mt-1">
-                Basado en el último reporte generado (
-                {new Date(datos.fecha_analisis).toLocaleDateString()})
-              </p>
-            </div>
-            <button
-              onClick={cargarDatos}
-              className="bg-[#725950] text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)]"
-            >
-              <RefreshCw
-                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
-              />
-              Actualizar
-            </button>
-          </div>
+      <main className="flex-1 bg-[#fbf9f8]">
+        <PageHeader
+          pageTitle={<>ANÁLISIS DE<br/>{miNegocio.nombre}</>}
+          pageDescription={`Basado en el último reporte generado (${new Date(datos.fecha_analisis).toLocaleDateString()})`}
+        >
+          <button
+            onClick={cargarDatos}
+            className="bg-[#725950] text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)]"
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+            />
+            Actualizar
+          </button>
+        </PageHeader>
+        <div className="p-8">
+          <div className="max-w-5xl mx-auto">
 
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 p-6 mb-8 flex flex-col md:flex-row gap-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
             <div className="flex-1">
@@ -359,6 +355,7 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
+      </div>
       </main>
     </div>
   );

@@ -1,38 +1,40 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Building2, MapPin, Phone, Pencil, X } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Building2, MapPin, Phone, Pencil, X } from "lucide-react";
+import { CATEGORIAS_LOCALES } from "@/types/categories";
+import PageHeader from "@/app/components/PageHeader";
 
 export default function ProfileEditPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [isReadOnly, setIsReadOnly] = useState(true);
-  const [mensaje, setMensaje] = useState({ tipo: '', texto: '' });
+  const [mensaje, setMensaje] = useState({ tipo: "", texto: "" });
 
   const [formData, setFormData] = useState({
-    nombre: '',
-    rut: '',
-    rubro: '',
-    direccion: '',
-    comuna: '',
-    telefono: ''
+    nombre: "",
+    rut: "",
+    rubro: "",
+    direccion: "",
+    comuna: "",
+    telefono: "",
   });
 
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const response = await fetch('/api/empresa/perfil');
+        const response = await fetch("/api/empresa/perfil");
         if (response.ok) {
           const result = await response.json();
           if (result.data) {
             setFormData({
-              nombre: result.data.nombre || '',
-              rut: result.data.rut || '',
-              rubro: result.data.rubro || '',
-              direccion: result.data.direccion || '',
-              comuna: result.data.comuna || '',
-              telefono: result.data.telefono || ''
+              nombre: result.data.nombre || "",
+              rut: result.data.rut || "",
+              rubro: result.data.rubro || "",
+              direccion: result.data.direccion || "",
+              comuna: result.data.comuna || "",
+              telefono: result.data.telefono || "",
             });
           }
         }
@@ -46,25 +48,28 @@ export default function ProfileEditPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMensaje({ tipo: '', texto: '' });
+    setMensaje({ tipo: "", texto: "" });
 
     try {
-      const response = await fetch('/api/empresa/perfil', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/empresa/perfil", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (response.ok) {
-        setMensaje({ tipo: 'success', texto: 'Perfil actualizado exitosamente.' });
+        setMensaje({
+          tipo: "success",
+          texto: "Perfil actualizado exitosamente.",
+        });
         setIsReadOnly(true);
-        setTimeout(() => setMensaje({ tipo: '', texto: '' }), 3000);
+        setTimeout(() => setMensaje({ tipo: "", texto: "" }), 3000);
       } else {
         const err = await response.json();
-        setMensaje({ tipo: 'error', texto: err.error || 'Error al guardar.' });
+        setMensaje({ tipo: "error", texto: err.error || "Error al guardar." });
       }
     } catch (error) {
-      setMensaje({ tipo: 'error', texto: 'Fallo de conexión.' });
+      setMensaje({ tipo: "error", texto: "Fallo de conexión." });
     } finally {
       setLoading(false);
     }
@@ -72,54 +77,50 @@ export default function ProfileEditPage() {
 
   const inputClass = (readOnly: boolean) => `
     w-full border rounded-xl px-4 py-3 text-sm outline-none transition-all duration-200
-    ${readOnly 
-      ? 'bg-transparent border-transparent text-[#817470] cursor-default' 
-      : 'bg-white/60 backdrop-blur-sm border-[#e4e2e2] text-[#1b1c1c] placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/10'}
+    ${
+      readOnly
+        ? "bg-transparent border-transparent text-[#817470] cursor-default"
+        : "bg-white/60 backdrop-blur-sm border-[#e4e2e2] text-[#1b1c1c] placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/10"
+    }
   `;
 
   return (
-    <div className="p-8" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <div className="max-w-4xl mx-auto">
-        {/* Header con botón de editar */}
-        <div className="mb-8 flex justify-between items-start">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#817470] mb-2">
-              PYMETRACKER
-            </p>
-            <h1 
-              className="text-3xl font-semibold text-[#1b1c1c] leading-tight"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-            >
-              MI PERFIL
-            </h1>
-            <p className="text-sm mt-2 text-[#4f4441]">
-              Información oficial de su PyME.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setIsReadOnly(!isReadOnly)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-              !isReadOnly 
-                ? 'bg-[#ffdad6]/30 text-[#93000a] hover:bg-[#ffdad6]/50' 
-                : 'bg-[#fedcd0]/30 text-[#725950] hover:bg-[#fedcd0]/50'
-            }`}
-          >
-            {isReadOnly ? (
-              <><Pencil className="h-4 w-4" /> Editar</>
-            ) : (
-              <><X className="h-4 w-4" /> Cancelar</>
-            )}
-          </button>
-        </div>
+    <div className="gap-6" style={{ fontFamily: "'Inter', sans-serif" }}>
+      <PageHeader
+        pageTitle="MI PERFIL"
+        pageDescription="Información oficial de su PyME."
+      >
+        <button
+          type="button"
+          onClick={() => setIsReadOnly(!isReadOnly)}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+            !isReadOnly
+              ? "bg-[#ffdad6]/30 text-[#93000a] hover:bg-[#ffdad6]/50"
+              : "bg-[#fedcd0]/30 text-[#725950] hover:bg-[#fedcd0]/50"
+          }`}
+        >
+          {isReadOnly ? (
+            <>
+              <Pencil className="h-4 w-4" /> Editar
+            </>
+          ) : (
+            <>
+              <X className="h-4 w-4" /> Cancelar
+            </>
+          )}
+        </button>
+      </PageHeader>
 
+      <div className="max-w-4xl mx-auto mt-10">
         {/* Mensaje */}
         {mensaje.texto && (
-          <div className={`mb-6 p-4 rounded-xl text-sm font-medium ${
-            mensaje.tipo === 'success' 
-              ? 'bg-[#dbe3f1]/30 text-[#575f6b] border border-[#dbe3f1]' 
-              : 'bg-[#ffdad6]/30 text-[#93000a] border border-[#ffdad6]'
-          }`}>
+          <div
+            className={`mb-6 p-4 rounded-xl text-sm font-medium ${
+              mensaje.tipo === "success"
+                ? "bg-[#dbe3f1]/30 text-[#575f6b] border border-[#dbe3f1]"
+                : "bg-[#ffdad6]/30 text-[#93000a] border border-[#ffdad6]"
+            }`}
+          >
             {mensaje.texto}
           </div>
         )}
@@ -132,54 +133,61 @@ export default function ProfileEditPage() {
               <div className="p-2 bg-[#fedcd0]/50 rounded-xl">
                 <Building2 className="h-5 w-5 text-[#725950]" />
               </div>
-              <h2 
+              <h2
                 className="text-lg font-semibold text-[#1b1c1c]"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
                 Identificación Comercial
               </h2>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
                   Nombre de la Empresa
                 </label>
-                <input 
+                <input
                   disabled={isReadOnly}
                   className={inputClass(isReadOnly)}
                   type="text"
                   value={formData.nombre}
-                  onChange={(e) => setFormData({...formData, nombre: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, nombre: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
                   RUT (ID Fiscal)
                 </label>
-                <input 
+                <input
                   disabled={isReadOnly}
                   className={inputClass(isReadOnly)}
                   type="text"
                   value={formData.rut}
-                  onChange={(e) => setFormData({...formData, rut: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, rut: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-2 md:col-span-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
                   Rubro
                 </label>
-                <select 
+                <select
                   disabled={isReadOnly}
                   className={`${inputClass(isReadOnly)} appearance-none cursor-pointer`}
                   value={formData.rubro}
-                  onChange={(e) => setFormData({...formData, rubro: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, rubro: e.target.value })
+                  }
                 >
                   <option value="">Seleccione una categoría</option>
-                  <option value="retail">Comercio Minorista</option>
-                  <option value="services">Servicios Profesionales</option>
-                  <option value="tech">Tecnología e Innovación</option>
-                  <option value="fnb">Alimentos y Bebidas</option>
+                  {CATEGORIAS_LOCALES.map((cat) => (
+                    <option key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -191,37 +199,41 @@ export default function ProfileEditPage() {
               <div className="p-2 bg-[#dbe3f1]/50 rounded-xl">
                 <MapPin className="h-5 w-5 text-[#575f6b]" />
               </div>
-              <h2 
+              <h2
                 className="text-lg font-semibold text-[#1b1c1c]"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
                 Ubicación y Contacto
               </h2>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2 md:col-span-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
                   Dirección
                 </label>
-                <input 
+                <input
                   disabled={isReadOnly}
                   className={inputClass(isReadOnly)}
                   type="text"
                   value={formData.direccion}
-                  onChange={(e) => setFormData({...formData, direccion: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, direccion: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
                   Ciudad / Región
                 </label>
-                <input 
+                <input
                   disabled={isReadOnly}
                   className={inputClass(isReadOnly)}
                   type="text"
                   value={formData.comuna}
-                  onChange={(e) => setFormData({...formData, comuna: e.target.value})}
+                  onChange={(e) =>
+                    setFormData({ ...formData, comuna: e.target.value })
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -230,12 +242,14 @@ export default function ProfileEditPage() {
                 </label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#817470]" />
-                  <input 
+                  <input
                     disabled={isReadOnly}
-                    className={`${inputClass(isReadOnly)} pl-11`}
+                    className={`${inputClass(isReadOnly)} !pl-8`}
                     type="tel"
                     value={formData.telefono}
-                    onChange={(e) => setFormData({...formData, telefono: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, telefono: e.target.value })
+                    }
                   />
                 </div>
               </div>
@@ -245,19 +259,19 @@ export default function ProfileEditPage() {
           {/* Botones (solo en modo edición) */}
           {!isReadOnly && (
             <div className="flex justify-end items-center gap-4 pt-4 animate-in slide-in-from-bottom-2 duration-300">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => setIsReadOnly(true)}
                 className="px-6 py-3 text-sm font-medium text-[#4f4441] hover:text-[#725950] transition-colors"
               >
                 Descartar
               </button>
-              <button 
+              <button
                 disabled={loading}
                 className="px-8 py-3 bg-[#725950] text-white text-sm font-medium rounded-xl hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)] disabled:opacity-50 disabled:cursor-not-allowed"
                 type="submit"
               >
-                {loading ? 'Guardando...' : 'Guardar Cambios'}
+                {loading ? "Guardando..." : "Guardar Cambios"}
               </button>
             </div>
           )}

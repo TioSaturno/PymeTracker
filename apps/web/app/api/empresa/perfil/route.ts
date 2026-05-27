@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pymetracker/db/create-client";
-import { empresas, usuarios } from "@pymetracker/db/schema";
+import { empresas, tiendas, usuarios } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth";
 
@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (usuarioAuth instanceof NextResponse) return usuarioAuth;
 
     const body = await request.json();
-    const { nombre, rubro } = body;
+    const { nombre, rubro, rut, direccion, comuna, telefono } = body;
 
     if (!nombre)
       return NextResponse.json({ error: "Nombre requerido" }, { status: 400 });
@@ -22,6 +22,10 @@ export async function POST(request: NextRequest) {
       .values({
         nombre,
         rubro,
+        rut,
+        direccion,
+        comuna,
+        telefono,
       })
       .returning();
 
@@ -54,13 +58,17 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { nombre, rubro } = body;
+    const { nombre, rubro, rut, direccion, comuna, telefono } = body;
 
     const [empresaActualizada] = await db
       .update(empresas)
       .set({
         nombre,
         rubro,
+        rut,
+        direccion,
+        comuna,
+        telefono,
       })
       .where(eq(empresas.id, usuario.empresaId))
       .returning();
@@ -84,7 +92,13 @@ export async function GET(request: NextRequest) {
       .from(empresas)
       .where(eq(empresas.id, usuario.empresaId))
       .limit(1);
-    return NextResponse.json({ data: empresa });
+
+    const tiendasList = await db
+      .select()
+      .from(tiendas)
+      .where(eq(tiendas.empresaId, usuario.empresaId));
+
+    return NextResponse.json({ data: { ...empresa, tiendas: tiendasList } });
   } catch (error) {
     return NextResponse.json(
       { error: "Error al cargar empresa" },

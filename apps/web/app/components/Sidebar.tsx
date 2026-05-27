@@ -15,11 +15,11 @@ import { useState } from "react";
 
 const navItems = [
   { href: "/", label: "Inicio", icon: LayoutGrid },
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/analisis", label: "Gráficas", icon: ChartNoAxesCombined },
+  { href: "/perfil/edit", label: "Mi Perfil", icon: User },
+  { href: "/dashboard", label: "Resumen", icon: LayoutDashboard },
   { href: "/analisis/historial", label: "Historial", icon: History },
   { href: "/competencia", label: "Competencia", icon: Users },
-  { href: "/perfil/edit", label: "Mi Perfil", icon: User },
+  { href: "/analisis", label: "Gráficas", icon: ChartNoAxesCombined },
 ];
 
 export default function Sidebar() {
