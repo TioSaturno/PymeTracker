@@ -59,40 +59,39 @@ async function extraerHtmlLimpio(page: Page): Promise<string> {
   });
 }
 
-// funcion para extraer HTML simplificado del menú
-async function extraerHtmlMenu(page: Page): Promise<string> {
-  const html = await page.evaluate(() => {
-    const body = document.body.cloneNode(true) as HTMLElement;
+/**
+ * Extrae solo el texto visible de la página + las URLs de imágenes relevantes.
+ * Mucho más eficiente que mandar HTML completo: menos tokens, mejor razonamiento del LLM.
+ */
+async function extraerTextoMenu(page: Page): Promise<string> {
+  return page.evaluate((maxLen: number) => {
+    // 1. Texto visible (innerText respeta display:none y visibilidad)
+    const textoVisible = document.body.innerText
+      .replace(/[\t ]+/g, " ")   // colapsar espacios/tabs
+      .replace(/\n{3,}/g, "\n\n") // máx 2 saltos de línea consecutivos
+      .trim()
+      .substring(0, maxLen);
 
-    // Eliminar elementos que solo aportan ruido
-    const ruido = body.querySelectorAll(
-      "script, style, noscript, svg, iframe, link, meta",
-    );
-    ruido.forEach((el) => el.remove());
-
-    // Colapsar atributos no relevantes, pero conservar src y data-src para imágenes
-    const todos = body.querySelectorAll("*");
-    todos.forEach((el) => {
-      const atributosBlancos = [
-        "href",
-        "src",
-        "data-src",
-        "alt",
-        "class",
-        "id",
-      ];
-      Array.from(el.attributes).forEach((attr) => {
-        if (!atributosBlancos.includes(attr.name)) {
-          el.removeAttribute(attr.name);
-        }
-      });
+    // 2. Recolectar URLs de imágenes que probablemente sean fotos de productos
+    //    (evitar iconos, logos y tracking pixels por tamaño mínimo)
+    const imagenes: string[] = [];
+    document.querySelectorAll("img[src], img[data-src]").forEach((img) => {
+      const el = img as HTMLImageElement;
+      const src = el.getAttribute("data-src") || el.getAttribute("src") || "";
+      const ancho = el.naturalWidth || el.width || 0;
+      const alto = el.naturalHeight || el.height || 0;
+      // Filtrar imágenes demasiado pequeñas (iconos/trackers) y SVGs inline
+      if (src && !src.startsWith("data:") && (ancho === 0 || ancho >= 60) && (alto === 0 || alto >= 60)) {
+        imagenes.push(src);
+      }
     });
 
-    return body.innerHTML;
-  });
+    const bloqueImagenes = imagenes.length > 0
+      ? `\n\n<imagenes_detectadas>\n${imagenes.slice(0, 40).join("\n")}\n</imagenes_detectadas>`
+      : "";
 
-  // Colapsar whitespace y truncar (más largo que el de la home porque necesitamos las imágenes)
-  return html.replace(/\s+/g, " ").trim().substring(0, CONFIG.maxHtmlLength);
+    return `<texto_pagina>\n${textoVisible}\n</texto_pagina>${bloqueImagenes}`;
+  }, CONFIG.maxHtmlLength);
 }
 
 async function analizarConDeepSeek(
@@ -137,7 +136,8 @@ async function extraerProductosConDeepSeek(
   textoMenu: string,
 ): Promise<ProductoPrecio[]> {
   try {
-    console.log("\n extrayendo informacion del menu con deepseek...");
+    console.log(`\n[DeepSeek] Enviando texto al LLM (${textoMenu.length} chars)...`);
+    console.log(`[DeepSeek] Preview: ${textoMenu.slice(0, 200).replace(/\n/g, " ")}`);
 
     const response = await deepseek.chat.completions.create({
       model: "deepseek-v4-flash",
@@ -149,8 +149,11 @@ async function extraerProductosConDeepSeek(
     });
 
     const content = response.choices[0]?.message?.content ?? "[]";
+    console.log("[DeepSeek] Respuesta cruda:", content.slice(0, 300));
+
     const cleaned = content.replace(/```json|```/g, "").trim();
     const parsed: ProductoPrecio[] = JSON.parse(cleaned);
+    console.log(`[DeepSeek] Productos extraídos: ${parsed.length}`);
     return parsed;
   } catch (error) {
     console.error("[DeepSeek] Error extrayendo productos:", error);
@@ -158,54 +161,134 @@ async function extraerProductosConDeepSeek(
   }
 }
 
-async function navegarYExtraerProductos(
+/**
+ * Navega de forma segura a una URL con fallback de estrategias waitUntil.
+ * Primero intenta "networkidle" (más estable para SPAs), si falla usa "domcontentloaded" + espera manual.
+ * Retorna true si la navegación fue exitosa, false si falló.
+ */
+async function navegarSeguro(
+  page: Page,
+  url: string,
+  label: string,
+): Promise<boolean> {
+  console.log(`\n[NAV] Intentando navegar a ${label}: ${url}`);
+
+  // Intento 1: networkidle
+  try {
+    await page.goto(url, { waitUntil: "networkidle", timeout: CONFIG.timeout });
+    await page.waitForTimeout(1_500);
+    const urlFinal = page.url();
+    console.log(`[NAV ✓] networkidle OK | pedida: ${url} | final: ${urlFinal}`);
+    if (urlFinal !== url) {
+      console.log(`[NAV] ↪ Redirect detectado → ${urlFinal}`);
+    }
+    return true;
+  } catch (e1) {
+    console.warn(
+      `[NAV] networkidle falló (${(e1 as Error).message?.slice(0, 80)}). Reintentando con domcontentloaded...`,
+    );
+  }
+
+  // Intento 2: domcontentloaded + espera manual
+  try {
+    await page.goto(url, {
+      waitUntil: "domcontentloaded",
+      timeout: CONFIG.timeout,
+    });
+    await page.waitForTimeout(3_000); // darle tiempo al JS de la página
+    const urlFinal = page.url();
+    console.log(`[NAV ✓] domcontentloaded OK | pedida: ${url} | final: ${urlFinal}`);
+    if (urlFinal !== url) {
+      console.log(`[NAV] ↪ Redirect detectado → ${urlFinal}`);
+    }
+    return true;
+  } catch (e2) {
+    console.error(
+      `[NAV ✗] Falló completamente la navegación a ${label}: ${url}`,
+      (e2 as Error).message?.slice(0, 120),
+    );
+    return false;
+  }
+}
+
+/**
+ * Función principal de extracción. Dado el análisis inicial del LLM:
+ *  - Si ya hay productos en la home → los devuelve directamente.
+ *  - Si hay menuUrl → navega a ella y extrae los productos.
+ *  - Si hay menuSelector → hace click y extrae los productos de la nueva página.
+ *  - En cada caso extrae el HTML del estado actual de la página y lo manda al LLM.
+ */
+async function extraerProductos(
   page: Page,
   analisis: LLMAnalysis,
   baseUrl: string,
 ): Promise<ProductoPrecio[]> {
-  // Resolver URL relativa contra baseUrl si es necesario
-  let destino: string | null = null;
+  // Caso 1: la home ya tiene productos → extraer directo sin navegar
+  if (analisis.preciosReferencia && analisis.preciosReferencia.length > 0) {
+    console.log(
+      "[*] Productos encontrados en la home. Extrayendo sin navegar.",
+    );
+    return analisis.preciosReferencia.map((p: any) => ({
+      producto: p.producto || "Producto desconocido",
+      precio: p.precio || "$0",
+      imagen_url: p.imagen_url || null,
+    }));
+  }
+
+  // Caso 2: el LLM encontró una URL directa al menú
   if (analisis.menuUrl) {
+    let destino: string;
     try {
       destino = new URL(analisis.menuUrl, baseUrl).href;
     } catch {
-      destino = analisis.menuUrl; // fallback por si acaso
+      destino = analisis.menuUrl;
     }
+
+    if (destino === baseUrl || destino === page.url()) {
+      // La "URL del menú" es la misma página → extraer directo
+      console.log(
+        "[*] menuUrl apunta a la misma página. Extrayendo sin navegar.",
+      );
+    } else {
+      const ok = await navegarSeguro(page, destino, "menuUrl");
+      if (!ok) {
+        console.error("[X] No se pudo navegar al menú. Retornando vacío.");
+        return [];
+      }
+    }
+
+    const textoMenu = await extraerTextoMenu(page);
+    return extraerProductosConDeepSeek(textoMenu);
   }
 
-  // Si hay selector, intentar hacer click en el elemento
-  if (!destino && analisis.menuSelector) {
+  // Caso 3: el LLM encontró un selector (botón/link) → hacer click
+  if (analisis.menuSelector) {
+    console.log(`[*] Intentando click en selector: ${analisis.menuSelector}`);
     try {
       await page.click(analisis.menuSelector, { timeout: 5_000 });
+      // Esperar a que la navegación/animación se complete
       await page.waitForLoadState("domcontentloaded", {
         timeout: CONFIG.timeout,
       });
-      destino = page.url();
-      console.log(`navegacion hacia: ${destino}`);
-    } catch {
-      console.warn(`[X] Selector no funcionó: ${analisis.menuSelector}`);
-    }
-  }
-
-  // Si tenemos URL directa, navegar a ella
-  if (destino && destino !== baseUrl && page.url() !== destino) {
-    try {
-      console.log(`\n navegando directamente a: ${destino}`);
-      await page.goto(destino, {
-        waitUntil: "networkidle",
-        timeout: CONFIG.timeout,
-      });
       await page.waitForTimeout(2_000);
-    } catch {
-      console.warn(`[X] No se pudo navegar a: ${destino}`);
+      console.log(`[NAV ✓] Click ejecutado. Página actual: ${page.url()}`);
+    } catch (eClick) {
+      console.warn(
+        `[X] Click en selector falló: ${analisis.menuSelector}`,
+        (eClick as Error).message?.slice(0, 80),
+      );
       return [];
     }
+
+    const textoMenu = await extraerTextoMenu(page);
+    return extraerProductosConDeepSeek(textoMenu);
   }
 
-  const htmlMenu = await extraerHtmlMenu(page);
-  const productos = await extraerProductosConDeepSeek(htmlMenu);
-
-  return productos;
+  // Caso 4: el LLM no encontró nada útil
+  console.warn(
+    "[!] El análisis no retornó productos, menuUrl ni menuSelector. Sin datos.",
+  );
+  return [];
 }
 
 // Funcion principal del scraper
@@ -234,24 +317,8 @@ export async function scrapeSitio(
     const htmlLimpio = await extraerHtmlLimpio(page);
     const analisis = await analizarConDeepSeek(htmlLimpio, url);
 
-    let preciosExtraidos: ProductoPrecio[] = [];
-
-    // 3. Si ya tenemos precios de referencia (productos) en la home, no navegamos al menú
-    if (analisis.preciosReferencia && analisis.preciosReferencia.length > 0) {
-      console.log(
-        "[*] Se encontraron productos/precios en la página principal. Omitiendo navegación al menú.",
-      );
-      // Mapeamos al formato ProductoPrecio asegurando que existan los campos
-      preciosExtraidos = analisis.preciosReferencia.map((p: any) => ({
-        producto: p.producto || "Producto desconocido",
-        precio: p.precio || "$0",
-        imagen_url: p.imagen_url || null,
-      }));
-    } else {
-      // 4. Navegar al menú y extraer productos con precios
-      console.log("[*] No se detectaron productos en la home. Navegando al menú...");
-      preciosExtraidos = await navegarYExtraerProductos(page, analisis, url);
-    }
+    // 3. Extraer productos (la función maneja todos los casos internamente)
+    const preciosExtraidos = await extraerProductos(page, analisis, url);
 
     return {
       url,
@@ -274,27 +341,3 @@ export async function scrapeSitio(
     await context.close();
   }
 }
-
-// Funcion para ejecutar una prueba del scraper (ahora no se usa, pq el scraperSitio es el que se ejecuta en el pipeline principal)
-export async function run() {
-  // link de prueba q saque de una exec de la api de places.
-  const urls = ["http://www.wonderlandcafe.cl/"];
-
-  const browser = await chromium.launch({ headless: CONFIG.headless });
-  const resultados: ScrapeResult[] = [];
-
-  for (const url of urls) {
-    const data = await scrapeSitio(url, browser);
-    resultados.push(data);
-  }
-
-  await browser.close();
-
-  // Output final
-  console.log("\n========================================");
-  console.log("RESULTADO FINAL:");
-  console.log(JSON.stringify(resultados, null, 2));
-  console.log("========================================");
-}
-
-//run().catch(console.error);

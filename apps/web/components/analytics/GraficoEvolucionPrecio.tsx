@@ -16,11 +16,11 @@ interface Props {
   color?: string;
 }
 
-export default function GraficoEvolucionPrecio({ data, label, color = "#000000" }: Props) {
+export default function GraficoEvolucionPrecio({ data, label, color = "#725950" }: Props) {
   if (!data || data.length === 0) {
     return (
-      <div className="flex-grow flex items-center justify-center bg-gray-50 h-full">
-        <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">
+      <div className="flex-grow flex items-center justify-center bg-[#f5f3f3]/30 h-full">
+        <p className="text-[#817470] font-semibold tracking-wider text-xs" style={{ fontFamily: "'Inter', sans-serif" }}>
           Sin datos
         </p>
       </div>
@@ -39,20 +39,26 @@ export default function GraficoEvolucionPrecio({ data, label, color = "#000000" 
             bottom: 20,
           }}
         >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="fecha" tick={{ fontSize: 11 }} angle={-25} textAnchor="end" height={50} />
-          <YAxis tick={{ fontSize: 12 }} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e4e2e2" />
+          <XAxis dataKey="fecha" tick={{ fontSize: 11, fill: "#4f4441" }} angle={-25} textAnchor="end" height={50} />
+          <YAxis tick={{ fontSize: 12, fill: "#4f4441" }} />
           <Tooltip
-            contentStyle={{ border: "2px solid black", borderRadius: 0 }}
+            contentStyle={{
+              border: "1px solid #e4e2e2",
+              borderRadius: "12px",
+              background: "rgba(255,255,255,0.9)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
+            }}
             formatter={(value: number) => [`$${value}`, label]}
           />
           <Line
             type="monotone"
             dataKey="precioPromedio"
             stroke={color}
-            strokeWidth={3}
-            dot={{ r: 5, fill: color, strokeWidth: 2, stroke: "#fff" }}
-            activeDot={{ r: 7 }}
+            strokeWidth={2.5}
+            dot={{ r: 4, fill: color, strokeWidth: 2, stroke: "#fbf9f8" }}
+            activeDot={{ r: 6 }}
             name={label}
           />
         </LineChart>

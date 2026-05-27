@@ -3,12 +3,15 @@
   "version": "1.0.0",
   "description": "PymeTracker monorepo — web app + scraping service",
   "private": true,
+  "packageManager": "npm@11.6.2",
   "workspaces": [
     "apps/*",
     "shared/*"
   ],
   "scripts": {
-    "dev:web": "NEXT_IGNORE_INCORRECT_LOCKFILE=1 npm run dev --workspace=apps/web",
+    "dev:web": "cross-env NEXT_IGNORE_INCORRECT_LOCKFILE=1 npm run dev --workspace=apps/web",
+    "dev:scraper": "npm run start:server --workspace=apps/scraping",
+    "dev:all": "concurrently --kill-others -n db,web,scraper \"docker compose -f shared/db/docker-compose.yml up\" \"npm run dev:web\" \"npm run dev:scraper\"",
     "scraper:pipeline": "npm run run:pipeline --workspace=apps/scraping",
     "build:web": "npm run build --workspace=apps/web",
     "db:local": "docker compose -f shared/db/docker-compose.yml up -d",
@@ -29,5 +32,20 @@
   "bugs": {
     "url": "https://github.com/TioSaturno/PymeTracker/issues"
   },
-  "homepage": "https://github.com/TioSaturno/PymeTracker#readme"
+  "homepage": "https://github.com/TioSaturno/PymeTracker#readme",
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "esbuild": "^0.28.0"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.2.4",
+    "autoprefixer": "^10.5.0",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
+    "lucide-react": "^1.14.0",
+    "postcss": "^8.5.14"
+  }
 }

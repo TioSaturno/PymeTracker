@@ -6,7 +6,6 @@ export default defineConfig({
   out: "./migrations",
   dbCredentials: {
     url:
-      process.env.DATABASE_URL ??
-      "postgres://loky:loky@localhost:5432/IngSoft",
+      process.env.DATABASE_URL ?? "postgres://loky:loky@localhost:5433/IngSoft",
   },
 });

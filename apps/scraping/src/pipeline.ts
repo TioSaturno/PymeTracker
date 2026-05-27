@@ -5,7 +5,7 @@ import { getPlacesData } from "./scrapers/scraper-maps";
 import { CONFIG, scrapeSitio } from "./scrapers/scraper";
 import { ProductoPrecio, PipelineOutput } from "./lib/scraperTypes";
 import { STRUCTURED_JSON_PROMPT } from "./lib/prompt";
-import { saveInDb } from "./db/save-db";
+import { updateStatus, saveInDb } from "./db/save-db";
 
 dotenv.config();
 
@@ -55,7 +55,6 @@ function calcularRangoPrecios(menu: ProductoPrecio[]): string | null {
   let max = -Infinity;
 
   for (const item of menu) {
-    // Limpiar el precio para extraer el número (cubre "$2.500", "2500", "CLP 2.500")
     const numStr = item.precio.replace(/[^\d]/g, "");
     if (!numStr) continue;
 
@@ -72,6 +71,105 @@ function calcularRangoPrecios(menu: ProductoPrecio[]): string | null {
   return `$${min.toLocaleString("es-CL")} - $${max.toLocaleString("es-CL")}`;
 }
 
+export async function runPipeline(
+  analisisId: number,
+  topic: string,
+  location: string,
+  nResults: number,
+  tiendaBase?: string,
+) {
+  try {
+    console.log(`\n🚀 Iniciando pipeline para: ${topic} en ${location}`);
+
+    // 1. Places Search
+    await updateStatus(analisisId, "places_search");
+    const places = await getPlacesData(topic, location, nResults);
+    if (!places || places.length === 0) {
+      console.log("No se encontraron lugares para analizar.");
+      await updateStatus(analisisId, "failed");
+      return null;
+    }
+
+    // 2. Web Scraping
+    await updateStatus(analisisId, "web_scraping");
+    const browser = await chromium.launch({ headless: CONFIG.headless });
+    const datosGlobales: any[] = [];
+
+    for (const place of places) {
+      const url = place.sitio_web;
+      const localData: any = {
+        localName: place.nombre,
+        PlacesData: { ...place },
+        menu: [],
+      };
+
+      if (
+        url &&
+        url.includes("http") &&
+        !url.includes("instagram") &&
+        !url.includes("facebook") &&
+        !url.includes("tiktok") &&
+        !url.includes("whatsapp") &&
+        !url.includes("pdf")
+      ) {
+        const data = await scrapeSitio(url, browser);
+        localData.menu = data.preciosExtraidos;
+      }
+
+      datosGlobales.push(localData);
+    }
+
+    await browser.close();
+
+    // 3. Preparar datos y analizar con LLM
+    let tiendaBaseData: any = null;
+    if (tiendaBase) {
+      const match = datosGlobales.find((local) =>
+        local.localName.toLowerCase().includes(tiendaBase.toLowerCase()),
+      );
+      if (match) {
+        tiendaBaseData = {
+          localName: match.localName,
+          PlacesData: match.PlacesData,
+          productosConPrecios: match.menu,
+        };
+        console.log(`\n🏪 Tienda base identificada: ${match.localName}`);
+      } else {
+        console.warn(
+          `\n⚠️ No se encontró "${tiendaBase}" entre los resultados.`,
+        );
+      }
+    }
+
+    const datosParaLLM = {
+      busqueda: { tema: topic, ubicacion: location },
+      tienda_base: tiendaBaseData,
+      negocios: datosGlobales.map((local) => ({
+        localName: local.localName,
+        PlacesData: local.PlacesData,
+        productosConPrecios: local.menu,
+      })),
+    };
+
+    await updateStatus(analisisId, "llm_analysis");
+    const resultado = await generarJsonEstructurado(datosParaLLM);
+
+    console.log("\n========================================");
+    console.log("RESULTADO JSON ESTRUCTURADO:");
+    console.log("========================================");
+    console.log(JSON.stringify(resultado, null, 2));
+
+    await updateStatus(analisisId, "completed", resultado);
+
+    return resultado;
+  } catch (error) {
+    console.error("Pipeline error:", error);
+    await updateStatus(analisisId, "failed");
+    return null;
+  }
+}
+
+// Versión para ejecución directa por CLI (testing)
 const pipeline = async (tiendaBase?: string) => {
   const topic = "Sushi";
   const location = "Ñuñoa";
@@ -89,7 +187,6 @@ const pipeline = async (tiendaBase?: string) => {
   for (const place of places) {
     const url = place.sitio_web;
 
-    // Objeto base para cada local
     const localData: any = {
       localName: place.nombre,
       PlacesData: { ...place },
@@ -103,7 +200,7 @@ const pipeline = async (tiendaBase?: string) => {
       !url.includes("facebook") &&
       !url.includes("tiktok") &&
       !url.includes("whatsapp") &&
-      !url.includes("pdf") // proximamente proceso para extraer PDFs y menus de instagram
+      !url.includes("pdf")
     ) {
       const data = await scrapeSitio(url, browser);
       localData.menu = data.preciosExtraidos;
@@ -114,7 +211,6 @@ const pipeline = async (tiendaBase?: string) => {
 
   await browser.close();
 
-  // Buscar la tienda base en los datos recopilados (si se proporcionó)
   let tiendaBaseData: any = null;
   if (tiendaBase) {
     const match = datosGlobales.find((local) =>
@@ -129,12 +225,11 @@ const pipeline = async (tiendaBase?: string) => {
       console.log(`\n🏪 Tienda base identificada: ${match.localName}`);
     } else {
       console.warn(
-        `\n⚠️ No se encontró "${tiendaBase}" entre los resultados. El análisis comparativo no estará disponible.`,
+        `\n⚠️ No se encontró "${tiendaBase}" entre los resultados.`,
       );
     }
   }
 
-  // Preparar datos completos para el LLM (incluimos los productos individuales)
   const datosParaLLM = {
     busqueda: { tema: topic, ubicacion: location },
     tienda_base: tiendaBaseData,
@@ -145,21 +240,18 @@ const pipeline = async (tiendaBase?: string) => {
     })),
   };
 
-  // Generar JSON estructurado con DeepSeek
   const resultado = await generarJsonEstructurado(datosParaLLM);
 
   console.log("\n========================================");
   console.log("RESULTADO JSON ESTRUCTURADO:");
   console.log("========================================");
   console.log(JSON.stringify(resultado, null, 2));
-  console.log("\n========================================");
 
-  // Guardar en la base de datos
   saveInDb(resultado);
 
   return resultado;
 };
 
-// Ejecutar el pipeline. Pasar el nombre de la tienda base como argumento para obtener análisis comparativo.
-// Ejemplo: pipeline("Yako Sushi") o pipeline() para solo recopilar datos sin análisis.
-pipeline();
+if (process.argv[1]?.includes("pipeline")) {
+  pipeline();
+}

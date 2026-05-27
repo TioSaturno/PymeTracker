@@ -10,12 +10,12 @@ import {
 } from "recharts";
 
 const COLORS = [
-  "#000000",
-  "#555555",
-  "#888888",
-  "#aaaaaa",
-  "#cccccc",
-  "#e0e0e0",
+  "#725950",
+  "#575f6b",
+  "#5d5f5f",
+  "#e0c0b4",
+  "#bfc7d4",
+  "#c6c6c7",
 ];
 
 interface Props {
@@ -61,7 +61,7 @@ const renderCustomLabel = ({
       textAnchor="middle"
       dominantBaseline="central"
       fontSize={12}
-      fontWeight="bold"
+      fontWeight="600"
     >
       {`${name} ${(percent * 100).toFixed(0)}%`}
     </text>
@@ -71,8 +71,8 @@ const renderCustomLabel = ({
 export default function GraficoComposicionOferta({ data }: Props) {
   if (!data || data.length === 0) {
     return (
-      <div className="flex-grow flex items-center justify-center bg-gray-50 h-full">
-        <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">
+      <div className="flex-grow flex items-center justify-center bg-[#f5f3f3]/30 h-full">
+        <p className="text-[#817470] font-semibold tracking-wider text-xs" style={{ fontFamily: "'Inter', sans-serif" }}>
           Sin datos
         </p>
       </div>
@@ -98,8 +98,8 @@ export default function GraficoComposicionOferta({ data }: Props) {
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}
-                stroke="#000"
-                strokeWidth={1}
+                stroke="#fbf9f8"
+                strokeWidth={2}
               />
             ))}
           </Pie>
@@ -108,10 +108,16 @@ export default function GraficoComposicionOferta({ data }: Props) {
               `${value} productos (${props.payload.porcentaje}%)`,
               name,
             ]}
-            contentStyle={{ border: "2px solid black", borderRadius: 0 }}
+            contentStyle={{
+              border: "1px solid #e4e2e2",
+              borderRadius: "12px",
+              background: "rgba(255,255,255,0.9)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
+            }}
           />
           <Legend
-            wrapperStyle={{ fontSize: 12, fontWeight: "bold" }}
+            wrapperStyle={{ fontSize: 12, fontWeight: "600", color: "#4f4441" }}
             layout="vertical"
             align="right"
             verticalAlign="middle"

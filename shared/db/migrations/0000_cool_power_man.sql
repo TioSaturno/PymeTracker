@@ -4,7 +4,10 @@ CREATE TABLE "analisis" (
 	"usuario_id" integer,
 	"status" varchar(20) DEFAULT 'pending',
 	"payload_data" jsonb NOT NULL,
-	"fecha_ejecucion" timestamp DEFAULT now()
+	"payload_procesado" jsonb,
+	"procesado" boolean DEFAULT false,
+	"fecha_ejecucion" timestamp DEFAULT now(),
+	"updated_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
 CREATE TABLE "ciudades" (
@@ -15,8 +18,12 @@ CREATE TABLE "ciudades" (
 --> statement-breakpoint
 CREATE TABLE "empresas" (
 	"id" serial PRIMARY KEY NOT NULL,
+	"rut" varchar(20),
 	"nombre" varchar(255) NOT NULL,
 	"rubro" varchar(100),
+	"direccion" text,
+	"comuna" varchar(100),
+	"telefono" varchar(50),
 	"fecha_registro" timestamp DEFAULT now()
 );
 --> statement-breakpoint

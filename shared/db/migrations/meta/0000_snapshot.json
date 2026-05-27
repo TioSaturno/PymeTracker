@@ -1,5 +1,5 @@
 {
-  "id": "787fe360-fec0-45e5-b03b-acaf923ca882",
+  "id": "85e5061f-2f5f-40b0-b6f2-5f2784fcc730",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -39,8 +39,28 @@
           "primaryKey": false,
           "notNull": true
         },
+        "payload_procesado": {
+          "name": "payload_procesado",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "procesado": {
+          "name": "procesado",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
         "fecha_ejecucion": {
           "name": "fecha_ejecucion",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
@@ -139,6 +159,12 @@
           "primaryKey": true,
           "notNull": true
         },
+        "rut": {
+          "name": "rut",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "nombre": {
           "name": "nombre",
           "type": "varchar(255)",
@@ -148,6 +174,24 @@
         "rubro": {
           "name": "rubro",
           "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direccion": {
+          "name": "direccion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "comuna": {
+          "name": "comuna",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "telefono": {
+          "name": "telefono",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false
         },
