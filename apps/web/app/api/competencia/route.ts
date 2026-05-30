@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@pymeTracker/db/create-client";
-import { analisis, tiendas } from "@pymeTracker/db/schema";
+import { db } from "@pymetracker/db/create-client";
+import { analisis, tiendas } from "@pymetracker/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth";
 
