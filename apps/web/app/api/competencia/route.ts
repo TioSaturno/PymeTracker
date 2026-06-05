@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@pymeTracker/db/create-client";
-import { analisis, tiendas } from "@pymeTracker/db/schema";
+import { db } from "@pymetracker/db/create-client";
+import { analisis, tiendas } from "@pymetracker/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth";
 
@@ -12,23 +12,19 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     let tiendaId = searchParams.get("tiendaId");
 
-    if (!tiendaId && usuario.empresaId) {
+    if (!tiendaId && usuario.empresaActivaId) {
       const [firstTienda] = await db
         .select({ id: tiendas.id })
         .from(tiendas)
-        .where(eq(tiendas.empresaId, usuario.empresaId))
+        .where(eq(tiendas.empresaId, usuario.empresaActivaId))
         .limit(1);
       if (firstTienda) tiendaId = String(firstTienda.id);
     }
 
     if (!tiendaId) {
-      return NextResponse.json(
-        { error: "No se encontró una tienda asociada" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "No se encontró una tienda asociada" }, { status: 400 });
     }
 
-    // Solo la última ejecución
     const [latest] = await db
       .select({
         id: analisis.id,
@@ -47,9 +43,7 @@ export async function GET(request: NextRequest) {
       .orderBy(desc(analisis.fechaEjecucion))
       .limit(1);
 
-    if (!latest) {
-      return NextResponse.json({ empresas: [], total: 0 });
-    }
+    if (!latest) return NextResponse.json({ empresas: [], total: 0 });
 
     const payload = latest.payload as {
       empresas: Array<Record<string, unknown>>;
@@ -60,7 +54,6 @@ export async function GET(request: NextRequest) {
       mas_criticado: string | null;
     };
 
-    // Excluimos el primer elemento (negocio propio)
     const competidores = (payload.empresas ?? []).slice(1).map((empresa) => ({
       ...empresa,
       _meta: {
@@ -72,15 +65,9 @@ export async function GET(request: NextRequest) {
       },
     }));
 
-    return NextResponse.json({
-      empresas: competidores,
-      total: competidores.length,
-    });
+    return NextResponse.json({ empresas: competidores, total: competidores.length });
   } catch (error) {
     console.error("Error fetching competencia:", error);
-    return NextResponse.json(
-      { error: "Error al cargar competencia" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Error al cargar competencia" }, { status: 500 });
   }
 }
