@@ -16,7 +16,7 @@ const deepseek = new OpenAI({
 });
 
 export const CONFIG = {
-  headless: false,
+  headless: true,
   timeout: 15_000,
   maxHtmlLength: 12_000,
   maxTextLength: 5_000,
