@@ -1,0 +1,11 @@
+node_modules
+.env
+.env.local
+*.log
+.git
+.gitignore
+.next
+dist
+build
+postgres_data
+ANALYTICS_DOCS.md
