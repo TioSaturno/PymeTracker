@@ -1,0 +1,1 @@
+ALTER TABLE "empresas" ADD COLUMN "dia_seleccionado" varchar(10) DEFAULT 'lunes';

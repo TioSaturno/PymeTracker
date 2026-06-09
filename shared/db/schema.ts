@@ -22,6 +22,7 @@ export const empresas = pgTable("empresas", {
   direccion: text("direccion"),
   comuna: varchar("comuna", { length: 100 }),
   telefono: varchar("telefono", { length: 50 }),
+  diaSeleccionado: varchar("dia_seleccionado", { length: 10 }).default("lunes"),
   fechaRegistro: timestamp("fecha_registro").defaultNow(),
 });
 

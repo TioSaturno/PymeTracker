@@ -189,7 +189,6 @@ export default function DashboardPage() {
 
   const router = useRouter();
 
-  
   const cargarCompetidor = useCallback(async (nombre: string, datosBase?: DatosDashboard) => {
     if (!nombre) return;
     try {
