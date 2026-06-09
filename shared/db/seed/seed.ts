@@ -47,7 +47,7 @@ async function main() {
       .values({
         empresaId: empresa.id,
         nombre: "Marcos Admin",
-        email: "admin@gmail.com",
+        email: "marcoscarreno78@gmail.com",
         passwordHash: passwordHash,
         rol: "admin",
       })
