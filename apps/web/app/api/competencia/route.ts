@@ -9,38 +9,40 @@ export async function GET(request: NextRequest) {
     const usuario = await requireAuth(request);
     if (usuario instanceof NextResponse) return usuario;
 
-    if (!usuario.empresaId) {
-      return NextResponse.json(
-        { error: "No tienes una empresa asociada" },
-        { status: 400 }
-      );
-    }
+    const { searchParams } = new URL(request.url);
+    let tiendaId = searchParams.get("tiendaId");
+    let nombreEmpresaActiva: string | null = null;
 
-  
-    const [empresaData, primerasTiendas] = await Promise.all([
-      db
+    if (!tiendaId && usuario.empresaActivaId) {
+      const [empresasData, tiendasData] = await Promise.all([
+        db
+          .select({ nombre: empresas.nombre })
+          .from(empresas)
+          .where(eq(empresas.id, usuario.empresaActivaId))
+          .limit(1),
+        db
+          .select({ id: tiendas.id })
+          .from(tiendas)
+          .where(eq(tiendas.empresaId, usuario.empresaActivaId))
+          .limit(1),
+      ]);
+
+      const firstTienda = tiendasData[0];
+      nombreEmpresaActiva = empresasData[0]?.nombre ?? null;
+      if (firstTienda) tiendaId = String(firstTienda.id);
+    } else if (usuario.empresaActivaId) {
+      const [empresaData] = await db
         .select({ nombre: empresas.nombre })
         .from(empresas)
-        .where(eq(empresas.id, usuario.empresaId))
-        .limit(1),
-      db
-        .select({ id: tiendas.id })
-        .from(tiendas)
-        .where(eq(tiendas.empresaId, usuario.empresaId))
-        .limit(1),
-    ]);
-
-    const empresa = empresaData[0];
-    const tienda = primerasTiendas[0];
-
-    if (!empresa || !tienda) {
-      return NextResponse.json(
-        { error: "No se encontró empresa o tienda asociada" },
-        { status: 400 }
-      );
+        .where(eq(empresas.id, usuario.empresaActivaId))
+        .limit(1);
+      nombreEmpresaActiva = empresaData?.nombre ?? null;
     }
 
-   
+    if (!tiendaId) {
+      return NextResponse.json({ error: "No se encontró una tienda asociada" }, { status: 400 });
+    }
+
     const [latest] = await db
       .select({
         id: analisis.id,
@@ -51,10 +53,10 @@ export async function GET(request: NextRequest) {
       .from(analisis)
       .where(
         and(
-          eq(analisis.tiendaId, tienda.id),
+          eq(analisis.tiendaId, Number(tiendaId)),
           eq(analisis.usuarioId, usuario.id),
-          eq(analisis.status, "completed")
-        )
+          eq(analisis.status, "completed"),
+        ),
       )
       .orderBy(desc(analisis.fechaEjecucion))
       .limit(1);
@@ -78,22 +80,22 @@ export async function GET(request: NextRequest) {
     };
 
     const todasEmpresas = payload.empresas ?? [];
+    const nombreEmpresa = nombreEmpresaActiva?.toLowerCase().trim() ?? null;
 
-    
-    const nombreEmpresa = empresa.nombre.toLowerCase().trim();
-
-    const miNegocio = todasEmpresas.find((e) => {
-      const nombreEnPayload = String(e.nombre ?? "").toLowerCase().trim();
-      
-      return (
-        nombreEnPayload === nombreEmpresa ||
-        nombreEnPayload.includes(nombreEmpresa) ||
-        nombreEmpresa.includes(nombreEnPayload)
-      );
-    });
+    const miNegocio = nombreEmpresa
+      ? todasEmpresas.find((e) => {
+          const nombreEnPayload = String(e.nombre ?? "").toLowerCase().trim();
+          return (
+            nombreEnPayload === nombreEmpresa ||
+            nombreEnPayload.includes(nombreEmpresa) ||
+            nombreEmpresa.includes(nombreEnPayload)
+          );
+        })
+      : null;
 
     const competidores = todasEmpresas
       .filter((e) => {
+        if (!nombreEmpresa) return true;
         const nombreEnPayload = String(e.nombre ?? "").toLowerCase().trim();
         return (
           nombreEnPayload !== nombreEmpresa &&
@@ -130,7 +132,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching competencia:", error);
     return NextResponse.json(
       { error: "Error al cargar competencia" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

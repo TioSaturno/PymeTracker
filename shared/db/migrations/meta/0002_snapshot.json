@@ -1,6 +1,6 @@
 {
-  "id": "d2a470be-12ae-4373-a3cc-c331b63f02bf",
-  "prevId": "85e5061f-2f5f-40b0-b6f2-5f2784fcc730",
+  "id": "cd8a3f0d-9dc7-4594-9f68-df2a057f2020",
+  "prevId": "d2a470be-12ae-4373-a3cc-c331b63f02bf",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -194,6 +194,13 @@
           "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false
+        },
+        "dia_seleccionado": {
+          "name": "dia_seleccionado",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'lunes'"
         },
         "fecha_registro": {
           "name": "fecha_registro",

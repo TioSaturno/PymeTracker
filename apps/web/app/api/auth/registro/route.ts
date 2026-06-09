@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pymetracker/db/create-client";
-import { usuarios, empresas } from "@pymetracker/db/schema";
+import { usuarios, empresas, usuarioEmpresas } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -13,91 +13,52 @@ export async function POST(request: NextRequest) {
     const { nombre, email, password, empresaNombre, empresaRubro } = body;
 
     if (!nombre || !email || !password) {
-      return NextResponse.json(
-        { error: "Nombre, email y password son requeridos" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Nombre, email y password son requeridos" }, { status: 400 });
     }
 
-    const existingUser = await db
-      .select()
-      .from(usuarios)
-      .where(eq(usuarios.email, email))
-      .limit(1);
-
+    const existingUser = await db.select().from(usuarios).where(eq(usuarios.email, email)).limit(1);
     if (existingUser.length > 0) {
-      return NextResponse.json(
-        { error: "El email ya está registrado" },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "El email ya está registrado" }, { status: 409 });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    let empresaId: number | null = null;
+    const [nuevoUsuario] = await db.insert(usuarios).values({ nombre, email, passwordHash }).returning();
+
+    let empresaActivaId: number | null = null;
 
     if (empresaNombre) {
-      const [nuevaEmpresa] = await db
-        .insert(empresas)
-        .values({
-          nombre: empresaNombre,
-          rubro: empresaRubro || null,
-        })
-        .returning();
+      const [nuevaEmpresa] = await db.insert(empresas).values({
+        nombre: empresaNombre,
+        rubro: empresaRubro || null,
+      }).returning();
 
-      empresaId = nuevaEmpresa.id;
+      empresaActivaId = nuevaEmpresa.id;
+
+      // Linkear usuario con empresa via tabla puente
+      await db.insert(usuarioEmpresas).values({
+        usuarioId: nuevoUsuario.id,
+        empresaId: nuevaEmpresa.id,
+        rol: "admin",
+      });
     }
 
-    const [nuevoUsuario] = await db
-      .insert(usuarios)
-      .values({
-        nombre,
-        email,
-        passwordHash,
-        empresaId,
-      })
-      .returning();
-
     const token = jwt.sign(
-      {
-        id: nuevoUsuario.id,
-        email: nuevoUsuario.email,
-        rol: nuevoUsuario.rol,
-        empresaId: nuevoUsuario.empresaId,
-      },
+      { id: nuevoUsuario.id, email: nuevoUsuario.email, rol: nuevoUsuario.rol, empresaActivaId },
       JWT_SECRET,
       { expiresIn: "7d" }
     );
 
-    const response = NextResponse.json(
-      {
-        data: {
-          usuario: {
-            id: nuevoUsuario.id,
-            nombre: nuevoUsuario.nombre,
-            email: nuevoUsuario.email,
-            rol: nuevoUsuario.rol,
-            empresaId: nuevoUsuario.empresaId,
-          },
-        },
+    const response = NextResponse.json({
+      data: {
+        usuario: { id: nuevoUsuario.id, nombre: nuevoUsuario.nombre, email: nuevoUsuario.email, rol: nuevoUsuario.rol, empresaActivaId },
       },
-      { status: 201 }
-    );
+    }, { status: 201 });
 
-    response.cookies.set("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60,
-      path: "/",
-    });
-
+    response.cookies.set("token", token, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", maxAge: 7 * 24 * 60 * 60, path: "/" });
     return response;
   } catch (error) {
     console.error("[POST /api/auth/registro]", error);
-    return NextResponse.json(
-      { error: "Error al registrar usuario" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error al registrar usuario" }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pymetracker/db/create-client";
-import { usuarios } from "@pymetracker/db/schema";
+import { usuarios, usuarioEmpresas } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -43,12 +43,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Buscar todas las empresas del usuario y tomar la primera como activa
+    const misEmpresas = await db
+      .select({ empresaId: usuarioEmpresas.empresaId })
+      .from(usuarioEmpresas)
+      .where(eq(usuarioEmpresas.usuarioId, usuario.id));
+
+    const empresaActivaId = misEmpresas[0]?.empresaId ?? null;
+
     const token = jwt.sign(
       {
         id: usuario.id,
         email: usuario.email,
         rol: usuario.rol,
-        empresaId: usuario.empresaId,
+        empresaActivaId,
       },
       JWT_SECRET,
       { expiresIn: "7d" }
@@ -61,7 +69,7 @@ export async function POST(request: NextRequest) {
           nombre: usuario.nombre,
           email: usuario.email,
           rol: usuario.rol,
-          empresaId: usuario.empresaId,
+          empresaActivaId,
         },
       },
     });

@@ -31,16 +31,22 @@ export const empresas = pgTable("empresas", {
 // ─────────────────────────────────────────────
 export const usuarios = pgTable("usuarios", {
   id: serial("id").primaryKey(),
-  empresaId: integer("empresa_id").references(() => empresas.id, {
-    onDelete: "cascade",
-  }),
   nombre: varchar("nombre", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   rol: varchar("rol", { length: 50 }).default("admin"),
   fechaCreacion: timestamp("fecha_creacion").defaultNow(),
 });
-
+// ─────────────────────────────────────────────
+// TABLA PUENTE: USUARIO ↔ EMPRESAS
+// ─────────────────────────────────────────────
+export const usuarioEmpresas = pgTable("usuario_empresas", {
+  id: serial("id").primaryKey(),
+  usuarioId: integer("usuario_id").notNull().references(() => usuarios.id, { onDelete: "cascade" }),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "cascade" }),
+  rol: varchar("rol", { length: 50 }).default("admin"),
+  fechaUnion: timestamp("fecha_union").defaultNow(),
+});
 // ─────────────────────────────────────────────
 // 3. CIUDADES (Filtro geográfico)
 // ─────────────────────────────────────────────
