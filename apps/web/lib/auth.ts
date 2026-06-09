@@ -5,10 +5,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-in-production";
 
 export async function getUsuarioFromRequest(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
-
-  if (!token) {
-    return null;
-  }
+  if (!token) return null;
 
   try {
     const secret = new TextEncoder().encode(JWT_SECRET);
@@ -19,6 +16,7 @@ export async function getUsuarioFromRequest(request: NextRequest) {
       email: string;
       rol: string;
       empresaId: number | null;
+      tiendaActivaId: number | null;
     };
   } catch {
     return null;
@@ -27,13 +25,8 @@ export async function getUsuarioFromRequest(request: NextRequest) {
 
 export async function requireAuth(request: NextRequest) {
   const usuario = await getUsuarioFromRequest(request);
-
   if (!usuario) {
-    return NextResponse.json(
-      { error: "No autorizado" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "No autorizado" }, { status: 401 });
   }
-
   return usuario;
 }

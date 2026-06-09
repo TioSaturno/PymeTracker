@@ -10,24 +10,15 @@ export async function GET(request: NextRequest) {
     if (usuario instanceof NextResponse) return usuario;
 
     const { searchParams } = new URL(request.url);
-    let tiendaId = searchParams.get("tiendaId");
-
-    if (!tiendaId && usuario.empresaId) {
-      const [firstTienda] = await db
-        .select({ id: tiendas.id })
-        .from(tiendas)
-        .where(eq(tiendas.empresaId, usuario.empresaId))
-        .limit(1);
-      if (firstTienda) tiendaId = String(firstTienda.id);
-    }
+    const tiendaIdParam = searchParams.get("tiendaId");
+    const tiendaId = tiendaIdParam ? Number(tiendaIdParam) : usuario.tiendaActivaId;
 
     if (!tiendaId) {
       return NextResponse.json(
-        { error: "No se encontró una tienda asociada" },
+        { error: "No hay una sucursal activa" }, 
         { status: 400 },
       );
     }
-
     // Solo la última ejecución
     const [latest] = await db
       .select({
@@ -39,7 +30,7 @@ export async function GET(request: NextRequest) {
       .from(analisis)
       .where(
         and(
-          eq(analisis.tiendaId, Number(tiendaId)),
+          eq(analisis.tiendaId, tiendaId),
           eq(analisis.usuarioId, usuario.id),
           eq(analisis.status, "completed"),
         ),
@@ -72,10 +63,10 @@ export async function GET(request: NextRequest) {
       },
     }));
 
-    return NextResponse.json({
-      empresas: competidores,
+    return NextResponse.json({ 
+      empresas: competidores, 
       total: competidores.length,
-    });
+        });
   } catch (error) {
     console.error("Error fetching competencia:", error);
     return NextResponse.json(

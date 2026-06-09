@@ -6,11 +6,18 @@ import { processWithDeepSeek, type DeepSeekResponse } from '../../../services/de
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    const usuario = await requireAuth(request);
+    if (usuario instanceof NextResponse) return usuario;
+
     const { searchParams } = new URL(request.url);
     const tiendaIdParam = searchParams.get('tiendaId');
-    const tiendaId = tiendaIdParam ? parseInt(tiendaIdParam, 10) : 1;
+    const tiendaId = tiendaIdParam ? parseInt(tiendaIdParam, 10) : usuario.tiendaActivaId;
+
+    if (!tiendaId) {
+      return NextResponse.json({ error: 'No hay una sucursal activa' }, { status: 400 });
+    }
 
     const records = await db.select()
       .from(analisis)
