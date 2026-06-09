@@ -35,6 +35,8 @@ export const usuarios = pgTable("usuarios", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   rol: varchar("rol", { length: 50 }).default("admin"),
+  resetToken: varchar("reset_token", { length: 255 }),
+  resetTokenExpires: timestamp("reset_token_expires"),
   fechaCreacion: timestamp("fecha_creacion").defaultNow(),
 });
 // ─────────────────────────────────────────────
