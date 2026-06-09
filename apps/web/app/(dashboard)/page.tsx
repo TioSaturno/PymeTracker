@@ -8,6 +8,7 @@ import {
   CircleUser,
   RefreshCw,
   Building2,
+  Download,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -23,6 +24,69 @@ export default function DashboardPage() {
   );
 
   const router = useRouter();
+
+  const exportarCSV = () => {
+    if (!datos) return;
+
+    const miNegocio = datos.mi_negocio;
+    const competidores = datos.competencia || [];
+    const masValorado = typeof datos.mas_valorado === "string"
+      ? datos.mas_valorado
+      : Array.isArray(datos.mas_valorado)
+        ? datos.mas_valorado.join(", ")
+        : "";
+    const masCriticado = typeof datos.mas_criticado === "string"
+      ? datos.mas_criticado
+      : Array.isArray(datos.mas_criticado)
+        ? datos.mas_criticado.join(", ")
+        : "";
+
+    const escapar = (v: any) => {
+      const s = String(v ?? "");
+      return s.includes(",") || s.includes('"') || s.includes("\n")
+        ? `"${s.replace(/"/g, '""')}"`
+        : s;
+    };
+
+    const lineas = [
+      [
+        "Nombre",
+        "Rating",
+        "Total Resenas",
+        "Rango Precio",
+        "Direccion",
+        "Sitio Web",
+        "Tipo",
+      ].join(","),
+    ];
+
+    for (const e of [miNegocio, ...competidores]) {
+      const c = e.calificaciones || {};
+      lineas.push(
+        [
+          escapar(e.nombre),
+          escapar(c.rating),
+          escapar(c.total_resenas),
+          escapar(c.rango_precio_gmaps),
+          escapar(e.direccion || e.ubicacion),
+          escapar(e.sitio_web),
+          e === miNegocio ? "Mi Negocio" : "Competencia",
+        ].join(","),
+      );
+    }
+
+    lineas.push("");
+    lineas.push(`Lo mas valorado,${escapar(masValorado)}`);
+    lineas.push(`Lo mas criticado,${escapar(masCriticado)}`);
+
+    const blob = new Blob([lineas.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pymetracker_${miNegocio.nombre.replace(/\s+/g, "_")}_${new Date(datos.fecha_analisis).toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const cargarDatos = async () => {
     try {
@@ -101,15 +165,24 @@ export default function DashboardPage() {
           pageTitle={<>ANÁLISIS DE<br/>{miNegocio.nombre}</>}
           pageDescription={`Basado en el último reporte generado (${new Date(datos.fecha_analisis).toLocaleDateString()})`}
         >
-          <button
-            onClick={cargarDatos}
-            className="bg-[#725950] text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)]"
-          >
-            <RefreshCw
-              className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
-            />
-            Actualizar
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={exportarCSV}
+              className="bg-white text-[#725950] border border-[#e4e2e2] px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium hover:bg-[#f5f3f3] transition-all duration-200"
+            >
+              <Download className="h-4 w-4" />
+              Exportar CSV
+            </button>
+            <button
+              onClick={cargarDatos}
+              className="bg-[#725950] text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)]"
+            >
+              <RefreshCw
+                className={`h-4 w-4 ${loading ? "animate-spin" : ""}`}
+              />
+              Actualizar
+            </button>
+          </div>
         </PageHeader>
         <div className="p-8">
           <div className="max-w-5xl mx-auto">
