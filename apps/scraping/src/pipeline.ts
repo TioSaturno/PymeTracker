@@ -5,7 +5,9 @@ import { getPlacesData } from "./scrapers/scraper-maps";
 import { CONFIG, scrapeSitio } from "./scrapers/scraper";
 import { ProductoPrecio, PipelineOutput } from "./lib/scraperTypes";
 import { STRUCTURED_JSON_PROMPT } from "./lib/prompt";
-import { updateStatus, saveInDb } from "./db/save-db";
+import { updateStatus, saveInDb, updateProcesado, obtenerEmailUsuario } from "./db/save-db";
+import { processWithDeepSeek } from "./services/deepseek";
+import { enviarCorreoAnalisis } from "./services/email";
 
 dotenv.config();
 
@@ -160,6 +162,20 @@ export async function runPipeline(
     console.log(JSON.stringify(resultado, null, 2));
 
     await updateStatus(analisisId, "completed", resultado);
+
+    if (resultado) {
+      console.log("\n🧠 Procesando datos para gráficos con DeepSeek...");
+      const llmResults = await processWithDeepSeek([resultado]);
+      if (llmResults[0]) {
+        await updateProcesado(analisisId, llmResults[0]);
+        console.log("✅ Datos procesados y guardados para gráficos");
+      }
+
+      const email = await obtenerEmailUsuario(analisisId);
+      if (email) {
+        await enviarCorreoAnalisis(email, resultado);
+      }
+    }
 
     return resultado;
   } catch (error) {
