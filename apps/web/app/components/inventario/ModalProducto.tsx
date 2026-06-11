@@ -21,7 +21,6 @@ export default function ModalProducto({ producto, onClose, onSave }: ModalProduc
     nombre: producto?.nombre ?? "",
     precio: producto?.precio ?? 0,
     categoria: producto?.categoria ?? "",
-    descripcion: producto?.descripcion ?? "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -94,19 +93,6 @@ export default function ModalProducto({ producto, onClose, onSave }: ModalProduc
               />
             </div>
             {errors.precio && <p className="text-xs text-[#ba1a1a] mt-1 ml-1">{errors.precio}</p>}
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#817470] mb-2">
-              Descripción <span className="text-[#817470] font-normal normal-case">(opcional)</span>
-            </label>
-            <textarea
-              value={form.descripcion ?? ""}
-              onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-              placeholder="Ej: Café americano tradicional 12oz"
-              rows={3}
-              className="w-full border border-[#e4e2e2] rounded-xl px-4 py-3 text-sm font-medium text-[#1b1c1c] bg-white/80 backdrop-blur-xl outline-none placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/20 transition-all duration-200 resize-none"
-            />
           </div>
 
           <div className="flex gap-3 pt-2">

@@ -52,8 +52,7 @@ export default function InventarioPage() {
       result = result.filter(
         (p) =>
           p.nombre.toLowerCase().includes(q) ||
-          p.categoria.toLowerCase().includes(q) ||
-          (p.descripcion ?? "").toLowerCase().includes(q),
+          p.categoria.toLowerCase().includes(q),
       );
     }
 
@@ -187,7 +186,7 @@ export default function InventarioPage() {
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Buscar por nombre, categoría o descripción..."
+                    placeholder="Buscar por nombre o categoría..."
                     className="w-full max-w-md border border-[#e4e2e2] rounded-xl px-4 py-3 text-sm font-medium text-[#1b1c1c] bg-white/80 backdrop-blur-xl outline-none placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/20 transition-all duration-200"
                   />
                 </div>

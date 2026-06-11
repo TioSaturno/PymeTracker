@@ -15,9 +15,6 @@ export default function ProductoRow({ producto, onEditar, onEliminar }: Producto
     <tr className="border-b border-[#e4e2e2] hover:bg-[#f5f3f3]/50 transition-colors duration-150">
       <td className="py-4 px-4">
         <p className="text-sm font-semibold text-[#1b1c1c]">{producto.nombre}</p>
-        {producto.descripcion && (
-          <p className="text-xs text-[#817470] mt-0.5 truncate max-w-[220px]">{producto.descripcion}</p>
-        )}
       </td>
       <td className="py-4 px-4">
         <span className="inline-block px-2.5 py-1 bg-[#fedcd0]/30 text-[#725950] text-[10px] font-semibold rounded-full border border-[#fedcd0]">
