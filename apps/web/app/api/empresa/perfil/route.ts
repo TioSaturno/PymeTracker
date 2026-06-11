@@ -58,7 +58,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { nombre, rubro, rut, direccion, comuna, telefono } = body;
+    const { nombre, rubro, rut, direccion, comuna, telefono, diaSeleccionado } = body;
 
     const [empresaActualizada] = await db
       .update(empresas)
@@ -69,6 +69,7 @@ export async function PUT(request: NextRequest) {
         direccion,
         comuna,
         telefono,
+        diaSeleccionado,
       })
       .where(eq(empresas.id, usuario.empresaId))
       .returning();
