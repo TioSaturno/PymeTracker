@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, MapPin, Phone, Calendar, Pencil, X } from "lucide-react";
+import { Building2, MapPin, Phone, Calendar, Store, Pencil, X } from "lucide-react";
 import { CATEGORIAS_LOCALES } from "@/types/categories";
 import PageHeader from "@/app/components/PageHeader";
 
@@ -22,6 +22,11 @@ export default function ProfileEditPage() {
     diaSeleccionado: "lunes",
   });
 
+  const [sucursalData, setSucursalData] = useState({
+    nombreSucursal: "",
+    direccionSucursal: "",
+  });
+
   useEffect(() => {
     async function fetchProfile() {
       try {
@@ -38,6 +43,12 @@ export default function ProfileEditPage() {
               telefono: result.data.telefono || "",
               diaSeleccionado: result.data.diaSeleccionado || "lunes",
             });
+            if (result.data.activeTienda) {
+              setSucursalData({
+                nombreSucursal: result.data.activeTienda.nombre || "",
+                direccionSucursal: result.data.activeTienda.direccion || "",
+              });
+            }
           }
         }
       } catch (error) {
@@ -56,7 +67,7 @@ export default function ProfileEditPage() {
       const response = await fetch("/api/empresa/perfil", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, ...sucursalData }),
       });
 
       if (response.ok) {
@@ -114,7 +125,6 @@ export default function ProfileEditPage() {
       </PageHeader>
 
       <div className="max-w-4xl mx-auto mt-10">
-        {/* Mensaje */}
         {mensaje.texto && (
           <div
             className={`mb-6 p-4 rounded-xl text-sm font-medium ${
@@ -127,9 +137,7 @@ export default function ProfileEditPage() {
           </div>
         )}
 
-        {/* Formulario */}
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Sección: Identificación */}
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 p-8 shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-[#fedcd0]/50 rounded-xl">
@@ -139,7 +147,7 @@ export default function ProfileEditPage() {
                 className="text-lg font-semibold text-[#1b1c1c]"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
-                Identificación Comercial
+                Información Empresa
               </h2>
             </div>
 
@@ -192,24 +200,6 @@ export default function ProfileEditPage() {
                   ))}
                 </select>
               </div>
-            </div>
-          </div>
-
-          {/* Sección: Ubicación */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 p-8 shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-[#dbe3f1]/50 rounded-xl">
-                <MapPin className="h-5 w-5 text-[#575f6b]" />
-              </div>
-              <h2
-                className="text-lg font-semibold text-[#1b1c1c]"
-                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-              >
-                Ubicación y Contacto
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2 md:col-span-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
                   Dirección
@@ -258,7 +248,51 @@ export default function ProfileEditPage() {
             </div>
           </div>
 
-          {/* Sección: Día de Análisis */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 p-8 shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-[#dbe3f1]/50 rounded-xl">
+                <Store className="h-5 w-5 text-[#575f6b]" />
+              </div>
+              <h2
+                className="text-lg font-semibold text-[#1b1c1c]"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+              >
+                Información Tienda
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
+                  Nombre de Sucursal
+                </label>
+                <input
+                  disabled={isReadOnly}
+                  className={inputClass(isReadOnly)}
+                  type="text"
+                  value={sucursalData.nombreSucursal}
+                  onChange={(e) =>
+                    setSucursalData({ ...sucursalData, nombreSucursal: e.target.value })
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
+                  Dirección de la Sucursal
+                </label>
+                <input
+                  disabled={isReadOnly}
+                  className={inputClass(isReadOnly)}
+                  type="text"
+                  value={sucursalData.direccionSucursal}
+                  onChange={(e) =>
+                    setSucursalData({ ...sucursalData, direccionSucursal: e.target.value })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 p-8 shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-[#fedcd0]/50 rounded-xl">
@@ -295,7 +329,6 @@ export default function ProfileEditPage() {
             </div>
           </div>
 
-          {/* Botones (solo en modo edición) */}
           {!isReadOnly && (
             <div className="flex justify-end items-center gap-4 pt-4 animate-in slide-in-from-bottom-2 duration-300">
               <button

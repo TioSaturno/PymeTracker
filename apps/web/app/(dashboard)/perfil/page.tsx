@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, MapPin, Phone } from "lucide-react";
+import { Building2, MapPin, Phone, Store } from "lucide-react";
 import PageHeader from "@/app/components/PageHeader";
 
 export default function CreateProfilePage() {
@@ -17,6 +17,11 @@ export default function CreateProfilePage() {
     direccion: "",
     comuna: "",
     telefono: "",
+  });
+
+  const [sucursalData, setSucursalData] = useState({
+    nombreSucursal: "",
+    direccionSucursal: "",
   });
 
   useEffect(() => {
@@ -34,6 +39,12 @@ export default function CreateProfilePage() {
               comuna: result.data.comuna || "",
               telefono: result.data.telefono || "",
             });
+            if (result.data.activeTienda) {
+              setSucursalData({
+                nombreSucursal: result.data.activeTienda.nombre || "",
+                direccionSucursal: result.data.activeTienda.direccion || "",
+              });
+            }
           }
         }
       } catch (error) {
@@ -52,7 +63,7 @@ export default function CreateProfilePage() {
       const response = await fetch("/api/empresa/perfil", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, ...sucursalData }),
       });
 
       if (response.ok) {
@@ -80,7 +91,6 @@ export default function CreateProfilePage() {
           pageDescription="Complete la información estructural de su PyME."
         />
 
-        {/* Mensaje */}
         {mensaje.texto && (
           <div
             className={`mb-6 p-4 rounded-xl text-sm font-medium ${
@@ -93,9 +103,7 @@ export default function CreateProfilePage() {
           </div>
         )}
 
-        {/* Formulario */}
         <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Sección: Identificación */}
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 p-8 shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 bg-[#fedcd0]/50 rounded-xl">
@@ -105,7 +113,7 @@ export default function CreateProfilePage() {
                 className="text-lg font-semibold text-[#1b1c1c]"
                 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
               >
-                Identificación Comercial
+                Información Empresa
               </h2>
             </div>
 
@@ -157,24 +165,6 @@ export default function CreateProfilePage() {
                   <option value="fnb">Alimentos y Bebidas</option>
                 </select>
               </div>
-            </div>
-          </div>
-
-          {/* Sección: Ubicación */}
-          <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 p-8 shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-[#dbe3f1]/50 rounded-xl">
-                <MapPin className="h-5 w-5 text-[#575f6b]" />
-              </div>
-              <h2
-                className="text-lg font-semibold text-[#1b1c1c]"
-                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-              >
-                Ubicación y Contacto
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2 md:col-span-2">
                 <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
                   Dirección
@@ -223,7 +213,52 @@ export default function CreateProfilePage() {
             </div>
           </div>
 
-          {/* Botones */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 p-8 shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-[#dbe3f1]/50 rounded-xl">
+                <Store className="h-5 w-5 text-[#575f6b]" />
+              </div>
+              <h2
+                className="text-lg font-semibold text-[#1b1c1c]"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+              >
+                Información Tienda
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
+                  Nombre de Sucursal
+                </label>
+                <input
+                  className="w-full border border-[#e4e2e2] rounded-xl px-4 py-3 text-sm text-[#1b1c1c] bg-white/60 backdrop-blur-sm outline-none placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/10 transition-all duration-200"
+                  type="text"
+                  value={sucursalData.nombreSucursal}
+                  onChange={(e) =>
+                    setSucursalData({ ...sucursalData, nombreSucursal: e.target.value })
+                  }
+                  placeholder="Ej. Sucursal Centro"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
+                  Dirección de la Sucursal
+                </label>
+                <input
+                  className="w-full border border-[#e4e2e2] rounded-xl px-4 py-3 text-sm text-[#1b1c1c] bg-white/60 backdrop-blur-sm outline-none placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/10 transition-all duration-200"
+                  type="text"
+                  value={sucursalData.direccionSucursal}
+                  onChange={(e) =>
+                    setSucursalData({ ...sucursalData, direccionSucursal: e.target.value })
+                  }
+                  placeholder="Av. Principal 1234, Local 5"
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="flex justify-end items-center gap-4 pt-4">
             <button
               type="button"
