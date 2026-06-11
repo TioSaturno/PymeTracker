@@ -35,32 +35,30 @@ export default function TicketsPage() {
   const [esAdmin, setEsAdmin] = useState(false);
 
   useEffect(() => {
-  async function cargar() {
-    try {
-      const [ticketsRes, meRes] = await Promise.all([
-        fetch("/api/tickets"),
-        fetch("/api/usuarios"),
-      ]);
+    async function cargar() {
+      try {
+        const [ticketsRes, meRes] = await Promise.all([
+          fetch("/api/tickets"),
+          fetch("/api/auth/me"),
+        ]);
 
-      if (ticketsRes.ok) {
-        const { data } = await ticketsRes.json();
-        setTickets(data);
-      }
+        if (ticketsRes.ok) {
+          const { data } = await ticketsRes.json();
+          setTickets(data);
+        }
 
-      if (meRes.ok) {
-        const { data } = await meRes.json();
-        // Para admin devuelve array, para usuario normal devuelve objeto
-        const me = Array.isArray(data) ? data[0] : data;
-        setEsAdmin(me?.rol === "admin");
+        if (meRes.ok) {
+          const { data } = await meRes.json();
+          setEsAdmin(data?.rol === "admin");
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
     }
-  }
-  cargar();
-}, []);
+    cargar();
+  }, []);
 
   const handleStatusChange = async (id: number, status: string) => {
     try {

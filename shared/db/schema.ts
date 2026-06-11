@@ -136,13 +136,22 @@ export const tickets = pgTable("tickets", {
 export const empresasRelations = relations(empresas, ({ many }) => ({
   usuarios: many(usuarios),
   tiendas: many(tiendas),
+  usuarioEmpresas: many(usuarioEmpresas),
 }));
 
-export const usuariosRelations = relations(usuarios, ({ one, many }) => ({
+export const usuarioEmpresasRelations = relations(usuarioEmpresas, ({ one }) => ({
+  usuario: one(usuarios, {
+    fields: [usuarioEmpresas.usuarioId],
+    references: [usuarios.id],
+  }),
   empresa: one(empresas, {
-    fields: [usuarios.empresaId],
+    fields: [usuarioEmpresas.empresaId],
     references: [empresas.id],
   }),
+}));
+
+export const usuariosRelations = relations(usuarios, ({ many }) => ({
+  usuarioEmpresas: many(usuarioEmpresas),
   analisis: many(analisis),
 }));
 

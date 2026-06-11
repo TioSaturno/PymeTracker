@@ -58,3 +58,5 @@ apps/*/build
 # AGENTS config
 currentTask.md
 AGENTS.md
+
+/apps/scheduler
