@@ -7,6 +7,7 @@ import {
   Users,
   History,
   User,
+  CreditCard,
   LogOut,
 } from "lucide-react";
 import Link from "next/link";
@@ -20,6 +21,7 @@ const navItems = [
   { href: "/analisis/historial", label: "Historial", icon: History },
   { href: "/competencia", label: "Competencia", icon: Users },
   { href: "/analisis", label: "Gráficas", icon: ChartNoAxesCombined },
+  { href: "/cuenta", label: "Mi Cuenta", icon: CreditCard },
 ];
 
 export default function Sidebar() {
