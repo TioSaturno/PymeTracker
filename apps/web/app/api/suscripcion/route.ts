@@ -147,18 +147,24 @@ export async function POST(request: NextRequest) {
     let flowCustomerId = userRow.flowCustomerId;
 
     if (!flowCustomerId) {
-      console.log("[DEBUG] createCustomer payload:", {
-        name: userRow.nombre,
-        email: userRow.email,
-        externalId: String(userRow.id),
-      });
-      const customer = await flow.createCustomer(
-        userRow.nombre,
-        userRow.email,
-        String(userRow.id),
-      );
-
-      flowCustomerId = customer.customerId;
+      try {
+        const customer = await flow.createCustomer(
+          userRow.nombre,
+          userRow.email,
+          String(userRow.id),
+        );
+        flowCustomerId = customer.customerId;
+      } catch {
+        // Si el externalId ya existe en Flow (ej: seed repetido),
+        // crear con un sufijo único
+        const fallbackId = `${userRow.id}-${Date.now()}`;
+        const customer = await flow.createCustomer(
+          userRow.nombre,
+          userRow.email,
+          fallbackId,
+        );
+        flowCustomerId = customer.customerId;
+      }
 
       await db
         .update(usuarios)
