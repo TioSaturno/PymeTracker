@@ -1,1 +1,0 @@
-ALTER TABLE "usuarios" ADD COLUMN "flow_customer_id" varchar(255);
