@@ -144,11 +144,7 @@ export const empresasRelations = relations(empresas, ({ many }) => ({
   tiendas: many(tiendas),
 }));
 
-export const usuariosRelations = relations(usuarios, ({ one, many }) => ({
-  empresa: one(empresas, {
-    fields: [usuarios.empresaId],
-    references: [empresas.id],
-  }),
+export const usuariosRelations = relations(usuarios, ({ many }) => ({
   analisis: many(analisis),
   suscripciones: many(suscripciones),
 }));
