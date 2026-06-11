@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const [tienda] = await db
       .select()
       .from(tiendas)
-      .where(and(eq(tiendas.id, tiendaId), eq(tiendas.empresaId, usuario.empresaId!)))
+      .where(and(eq(tiendas.id, tiendaId), eq(tiendas.empresaId, usuario.empresaActivaId!)))
       .limit(1);
 
     if (!tienda) {
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       id: usuario.id,
       email: usuario.email,
       rol: usuario.rol,
-      empresaId: usuario.empresaId,
+      empresaActivaId: usuario.empresaActivaId,
       tiendaActivaId: tiendaId,
     })
       .setProtectedHeader({ alg: "HS256" })

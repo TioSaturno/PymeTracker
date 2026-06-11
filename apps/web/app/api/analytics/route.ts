@@ -1,8 +1,26 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from "@/lib/auth";
 import { db } from '@pymetracker/db/create-client';
 import { analisis } from '@pymetracker/db/schema';
 import { eq } from 'drizzle-orm';
-import { processWithDeepSeek, type DeepSeekResponse } from '../../../services/deepseek';
+
+interface DeepSeekProduct {
+  producto_original: string;
+  categoria: string;
+  precio_lista: number;
+  precio_unitario: number;
+  unidad: string;
+}
+
+interface DeepSeekEmpresa {
+  nombre: string;
+  productos: DeepSeekProduct[];
+}
+
+interface DeepSeekResponse {
+  empresas: DeepSeekEmpresa[];
+  categorias_principales: string[];
+}
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -19,48 +37,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No hay una sucursal activa' }, { status: 400 });
     }
 
-    const records = await db.select()
-      .from(analisis)
-      .where(eq(analisis.tiendaId, tiendaId));
-
-    if (records.length === 0) {
-      return NextResponse.json({ error: 'No analysis data found' }, { status: 404 });
-    }
-
-    const unprocessed = records.filter((r: any) => !r.procesado);
-
-    if (unprocessed.length > 0) {
-      try {
-        const batch = unprocessed.slice(0, 10);
-        const payloads = batch.map((r: any) => r.payloadData as any).filter(p => p && p.empresas);
-
-        if (payloads.length > 0) {
-          const llmResults = await processWithDeepSeek(payloads);
-
-          for (let i = 0; i < batch.length; i++) {
-            const record = batch[i];
-            const llmResult = llmResults[i] || null;
-
-            await db.update(analisis)
-              .set({
-                payloadProcesado: llmResult,
-                procesado: true,
-              })
-              .where(eq(analisis.id, record.id));
-          }
-        }
-      } catch (llmError) {
-        console.error('DeepSeek processing failed:', llmError);
-        return NextResponse.json(
-          { error: 'Procesamiento con IA en progreso. Intenta nuevamente en unos segundos.' },
-          { status: 503 }
-        );
-      }
-    }
-
     const allRecords = await db.select()
       .from(analisis)
       .where(eq(analisis.tiendaId, tiendaId));
+
+    if (allRecords.length === 0) {
+      return NextResponse.json({ error: 'No analysis data found' }, { status: 404 });
+    }
 
     const processedRecords = allRecords.filter((r: any) => r.procesado && r.payloadProcesado);
 

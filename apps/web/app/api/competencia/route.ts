@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@pymeTracker/db/create-client";
-import { analisis, tiendas } from "@pymeTracker/db/schema";
+import { db } from "@pymetracker/db/create-client";
+import { analisis, tiendas, empresas } from "@pymetracker/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth";
 
@@ -10,16 +10,46 @@ export async function GET(request: NextRequest) {
     if (usuario instanceof NextResponse) return usuario;
 
     const { searchParams } = new URL(request.url);
-    const tiendaIdParam = searchParams.get("tiendaId");
-    const tiendaId = tiendaIdParam ? Number(tiendaIdParam) : usuario.tiendaActivaId;
+    let tiendaId: number | null = searchParams.get("tiendaId")
+      ? Number(searchParams.get("tiendaId"))
+      : null;
+    let nombreEmpresaActiva: string | null = null;
+
+    // Si no viene por query, usar tiendaActivaId del JWT
+    if (!tiendaId && usuario.tiendaActivaId) {
+      tiendaId = usuario.tiendaActivaId;
+    }
+
+    // Si aún no hay, derivar desde empresaActivaId
+    if (!tiendaId && usuario.empresaActivaId) {
+      const [empresasData, tiendasData] = await Promise.all([
+        db
+          .select({ nombre: empresas.nombre })
+          .from(empresas)
+          .where(eq(empresas.id, usuario.empresaActivaId))
+          .limit(1),
+        db
+          .select({ id: tiendas.id })
+          .from(tiendas)
+          .where(eq(tiendas.empresaId, usuario.empresaActivaId))
+          .limit(1),
+      ]);
+
+      const firstTienda = tiendasData[0];
+      nombreEmpresaActiva = empresasData[0]?.nombre ?? null;
+      if (firstTienda) tiendaId = firstTienda.id;
+    } else if (usuario.empresaActivaId) {
+      const [empresaData] = await db
+        .select({ nombre: empresas.nombre })
+        .from(empresas)
+        .where(eq(empresas.id, usuario.empresaActivaId))
+        .limit(1);
+      nombreEmpresaActiva = empresaData?.nombre ?? null;
+    }
 
     if (!tiendaId) {
-      return NextResponse.json(
-        { error: "No hay una sucursal activa" }, 
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "No se encontró una tienda asociada" }, { status: 400 });
     }
-    // Solo la última ejecución
     const [latest] = await db
       .select({
         id: analisis.id,
@@ -39,7 +69,7 @@ export async function GET(request: NextRequest) {
       .limit(1);
 
     if (!latest) {
-      return NextResponse.json({ empresas: [], total: 0 });
+      return NextResponse.json({ empresas: [], total: 0, miNegocio: null });
     }
 
     const payload = latest.payload as {
@@ -49,24 +79,62 @@ export async function GET(request: NextRequest) {
       total_empresas: number;
       mas_valorado: string | null;
       mas_criticado: string | null;
+      analisis_tienda_base: {
+        comparacion_precios: string;
+        comparacion_general: string;
+        conclusion: string;
+      } | null;
     };
 
-    // Excluimos el primer elemento (negocio propio)
-    const competidores = (payload.empresas ?? []).slice(1).map((empresa) => ({
-      ...empresa,
-      _meta: {
-        analisisId: latest.id,
-        status: latest.status,
-        fechaEjecucion: latest.fechaEjecucion,
-        busqueda: payload.busqueda,
-        fecha: payload.fecha,
-      },
-    }));
+    const todasEmpresas = payload.empresas ?? [];
+    const nombreEmpresa = nombreEmpresaActiva?.toLowerCase().trim() ?? null;
+
+    const miNegocio = nombreEmpresa
+      ? todasEmpresas.find((e) => {
+          const nombreEnPayload = String(e.nombre ?? "").toLowerCase().trim();
+          return (
+            nombreEnPayload === nombreEmpresa ||
+            nombreEnPayload.includes(nombreEmpresa) ||
+            nombreEmpresa.includes(nombreEnPayload)
+          );
+        })
+      : null;
+
+    const competidores = todasEmpresas
+      .filter((e) => {
+        if (!nombreEmpresa) return true;
+        const nombreEnPayload = String(e.nombre ?? "").toLowerCase().trim();
+        return (
+          nombreEnPayload !== nombreEmpresa &&
+          !nombreEnPayload.includes(nombreEmpresa) &&
+          !nombreEmpresa.includes(nombreEnPayload)
+        );
+      })
+      .map((empresa) => ({
+        ...empresa,
+        _meta: {
+          analisisId: latest.id,
+          status: latest.status,
+          fechaEjecucion: latest.fechaEjecucion,
+          busqueda: payload.busqueda,
+          fecha: payload.fecha,
+        },
+      }));
 
     return NextResponse.json({ 
       empresas: competidores, 
       total: competidores.length,
-        });
+      miNegocio: miNegocio
+        ? {
+            ...miNegocio,
+            analisis_tienda_base: payload.analisis_tienda_base,
+          }
+        : null,
+      masValorado: payload.mas_valorado,
+      masCriticado: payload.mas_criticado,
+      busqueda: payload.busqueda,
+      fechaAnalisis: latest.fechaEjecucion,
+    });
   } catch (error) {
     console.error("Error fetching competencia:", error);
     return NextResponse.json(

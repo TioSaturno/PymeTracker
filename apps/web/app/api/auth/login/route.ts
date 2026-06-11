@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pymetracker/db/create-client";
-import { usuarios, tiendas } from "@pymetracker/db/schema";
+import { usuarios, tiendas, usuarioEmpresas } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
@@ -27,13 +27,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Credenciales inválidas" }, { status: 401 });
     }
 
-    // Buscar primera tienda como activa por defecto
+    // Buscar empresas del usuario y tomar la primera como activa
+    const misEmpresas = await db
+      .select({ empresaId: usuarioEmpresas.empresaId })
+      .from(usuarioEmpresas)
+      .where(eq(usuarioEmpresas.usuarioId, usuario.id));
+
+    const empresaActivaId = misEmpresas[0]?.empresaId ?? null;
+
+    // Buscar primera tienda de la empresa activa
     let tiendaActivaId: number | null = null;
-    if (usuario.empresaId) {
+    if (empresaActivaId) {
       const [primeraTienda] = await db
         .select({ id: tiendas.id })
         .from(tiendas)
-        .where(eq(tiendas.empresaId, usuario.empresaId))
+        .where(eq(tiendas.empresaId, empresaActivaId))
         .limit(1);
       tiendaActivaId = primeraTienda?.id ?? null;
     }
@@ -43,7 +51,7 @@ export async function POST(request: NextRequest) {
       id: usuario.id,
       email: usuario.email,
       rol: usuario.rol,
-      empresaId: usuario.empresaId,
+      empresaActivaId,
       tiendaActivaId,
     })
       .setProtectedHeader({ alg: "HS256" })
@@ -57,7 +65,7 @@ export async function POST(request: NextRequest) {
           nombre: usuario.nombre,
           email: usuario.email,
           rol: usuario.rol,
-          empresaId: usuario.empresaId,
+          empresaActivaId,
           tiendaActivaId,
         },
       },

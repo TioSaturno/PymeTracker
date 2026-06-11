@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     const usuario = await getUsuarioFromRequest(request);
     if (!usuario) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-    if (!usuario.empresaId) {
+    if (!usuario.empresaActivaId) {
       return NextResponse.json({ error: "Sin empresa asociada" }, { status: 400 });
     }
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     const [nuevaTienda] = await db
       .insert(tiendas)
-      .values({ nombre, direccion, empresaId: usuario.empresaId })
+      .values({ nombre, direccion, empresaId: usuario.empresaActivaId })
       .returning();
 
     // Emitir nuevo token con la nueva tienda como activa
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       id: usuario.id,
       email: usuario.email,
       rol: usuario.rol,
-      empresaId: usuario.empresaId,
+      empresaActivaId: usuario.empresaActivaId,
       tiendaActivaId: nuevaTienda.id,
     })
       .setProtectedHeader({ alg: "HS256" })

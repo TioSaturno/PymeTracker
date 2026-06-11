@@ -10,12 +10,11 @@ export async function getUsuarioFromRequest(request: NextRequest) {
   try {
     const secret = new TextEncoder().encode(JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
-
     return payload as {
       id: number;
       email: string;
       rol: string;
-      empresaId: number | null;
+      empresaActivaId: number | null;
       tiendaActivaId: number | null;
     };
   } catch {

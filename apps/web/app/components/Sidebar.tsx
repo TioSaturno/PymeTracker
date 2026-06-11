@@ -1,7 +1,7 @@
 "use client";
 import {
   LayoutGrid, LayoutDashboard, ChartNoAxesCombined,
-  Users, History, User, LogOut, ChevronDown, MapPin, Plus,
+  Users, History, User, LogOut, ChevronDown, MapPin, Plus, Check,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -36,7 +36,10 @@ export default function Sidebar() {
         const { data } = await res.json();
         if (!data?.tiendas?.length) return;
         setSucursales(data.tiendas);
-        setActiva(data.tiendas[0]);
+        const activaDesdeToken = data.tiendas.find(
+          (t: Tienda) => t.id === data.tiendaActivaId
+        );
+        setActiva(activaDesdeToken || data.tiendas[0]);
       } catch (e) {
         console.error("Error cargando sucursales:", e);
       }
@@ -131,7 +134,7 @@ export default function Sidebar() {
                       <p className="text-xs font-medium text-[#1b1c1c] truncate">{tienda.nombre}</p>
                       <p className="text-[10px] text-[#817470] truncate">{tienda.direccion ?? "Sin dirección"}</p>
                     </div>
-                    {isActive && <div className="w-1.5 h-1.5 rounded-full bg-[#725950] flex-shrink-0" />}
+                    {isActive && <Check className="h-3 w-3 text-[#725950] flex-shrink-0" />}
                   </button>
                 );
               })}
