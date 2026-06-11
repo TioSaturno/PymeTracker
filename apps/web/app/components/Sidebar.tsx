@@ -1,7 +1,7 @@
 "use client";
 import {
   LayoutGrid, LayoutDashboard, ChartNoAxesCombined,
-  Users, History, User, LogOut, ChevronDown, MapPin, Plus, Check,
+  Users, History, User, LogOut, ChevronDown, MapPin, Plus, Check, LifeBuoy,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -14,6 +14,7 @@ const navItems = [
   { href: "/analisis/historial", label: "Historial", icon: History },
   { href: "/competencia", label: "Competencia", icon: Users },
   { href: "/analisis", label: "Gráficas", icon: ChartNoAxesCombined },
+  { href: "/tickets", label: "Soporte", icon: LifeBuoy },
 ];
 
 type Tienda = { id: number; nombre: string; direccion: string | null };
