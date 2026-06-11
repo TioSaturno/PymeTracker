@@ -31,16 +31,22 @@ export const empresas = pgTable("empresas", {
 // ─────────────────────────────────────────────
 export const usuarios = pgTable("usuarios", {
   id: serial("id").primaryKey(),
-  empresaId: integer("empresa_id").references(() => empresas.id, {
-    onDelete: "cascade",
-  }),
   nombre: varchar("nombre", { length: 255 }).notNull(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   rol: varchar("rol", { length: 50 }).default("admin"),
   fechaCreacion: timestamp("fecha_creacion").defaultNow(),
 });
-
+// ─────────────────────────────────────────────
+// TABLA PUENTE: USUARIO ↔ EMPRESAS
+// ─────────────────────────────────────────────
+export const usuarioEmpresas = pgTable("usuario_empresas", {
+  id: serial("id").primaryKey(),
+  usuarioId: integer("usuario_id").notNull().references(() => usuarios.id, { onDelete: "cascade" }),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "cascade" }),
+  rol: varchar("rol", { length: 50 }).default("admin"),
+  fechaUnion: timestamp("fecha_union").defaultNow(),
+});
 // ─────────────────────────────────────────────
 // 3. CIUDADES (Filtro geográfico)
 // ─────────────────────────────────────────────
@@ -83,13 +89,29 @@ export const analisis = pgTable(
     /** Indica si el análisis ya fue procesado por el LLM */
     procesado: boolean("procesado").default(false),
     fechaEjecucion: timestamp("fecha_ejecucion").defaultNow(),
-    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date()),
   },
   (table) => ({
     // Índice GIN para búsquedas rápidas dentro del JSONB
     payloadIdx: index("idx_analisis_payload").using("gin", table.payloadData),
-  }),
+  })
 );
+
+// ─────────────────────────────────────────────
+// 6. INVENTARIOS (Productos en tiendas)
+// ─────────────────────────────────────────────
+export const inventarios = pgTable("inventarios", {
+  id: serial("id").primaryKey(),
+  tiendaId: integer("tienda_id").references(() => tiendas.id, {
+    onDelete: "cascade",
+  }),
+  nombre: varchar("nombre", { length: 255 }).notNull(),
+  categoria: varchar("categoria", { length: 100 }).notNull(),
+  precio: integer("precio").notNull(),
+  fechaAgregado: timestamp("fecha_agregado").defaultNow(),
+});
 
 // ─────────────────────────────────────────────
 // RELACIONES
@@ -121,6 +143,7 @@ export const tiendasRelations = relations(tiendas, ({ one, many }) => ({
     references: [ciudades.id],
   }),
   analisis: many(analisis),
+  inventarios: many(inventarios),
 }));
 
 export const analisisRelations = relations(analisis, ({ one }) => ({
@@ -131,6 +154,13 @@ export const analisisRelations = relations(analisis, ({ one }) => ({
   usuario: one(usuarios, {
     fields: [analisis.usuarioId],
     references: [usuarios.id],
+  }),
+}));
+
+export const inventariosRelations = relations(inventarios, ({ one }) => ({
+  tienda: one(tiendas, {
+    fields: [inventarios.tiendaId],
+    references: [tiendas.id],
   }),
 }));
 
@@ -151,3 +181,6 @@ export type NuevaTienda = typeof tiendas.$inferInsert;
 
 export type Analisis = typeof analisis.$inferSelect;
 export type NuevoAnalisis = typeof analisis.$inferInsert;
+
+export type Inventario = typeof inventarios.$inferSelect;
+export type NuevoInventario = typeof inventarios.$inferInsert;

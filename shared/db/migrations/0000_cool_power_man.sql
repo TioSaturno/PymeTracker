@@ -46,10 +46,20 @@ CREATE TABLE "usuarios" (
 	"fecha_creacion" timestamp DEFAULT now(),
 	CONSTRAINT "usuarios_email_unique" UNIQUE("email")
 );
+
+CREATE TABLE "inventarios" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"tienda_id" integer,
+	"nombre" varchar(255) NOT NULL,
+	"categoria" varchar(100) NOT NULL,
+	"precio" integer NOT NULL,
+	"fecha_agregado" timestamp DEFAULT now()
+);
 --> statement-breakpoint
 ALTER TABLE "analisis" ADD CONSTRAINT "analisis_tienda_id_tiendas_id_fk" FOREIGN KEY ("tienda_id") REFERENCES "public"."tiendas"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "analisis" ADD CONSTRAINT "analisis_usuario_id_usuarios_id_fk" FOREIGN KEY ("usuario_id") REFERENCES "public"."usuarios"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tiendas" ADD CONSTRAINT "tiendas_empresa_id_empresas_id_fk" FOREIGN KEY ("empresa_id") REFERENCES "public"."empresas"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tiendas" ADD CONSTRAINT "tiendas_ciudad_id_ciudades_id_fk" FOREIGN KEY ("ciudad_id") REFERENCES "public"."ciudades"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "usuarios" ADD CONSTRAINT "usuarios_empresa_id_empresas_id_fk" FOREIGN KEY ("empresa_id") REFERENCES "public"."empresas"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "inventarios" ADD CONSTRAINT "inventarios_tienda_id_tiendas_id_fk" FOREIGN KEY ("tienda_id") REFERENCES "public"."tiendas"("id") ON DELETE cascade ON UPDATE no action;
 CREATE INDEX "idx_analisis_payload" ON "analisis" USING gin ("payload_data");
