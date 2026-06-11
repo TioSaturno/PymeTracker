@@ -12,7 +12,9 @@ import {
   MapPin,
   Plus,
   Check,
+  LifeBuoy,
   CreditCard,
+  Shield,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -26,12 +28,21 @@ const navItems = [
   { href: "/inventario", label: "Inventario", icon: Package },
   { href: "/competencia", label: "Competencia", icon: Users },
   { href: "/analisis", label: "Gráficas", icon: ChartNoAxesCombined },
+  { href: "/tickets", label: "Soporte", icon: LifeBuoy },
   { href: "/cuenta", label: "Mi Cuenta", icon: CreditCard },
 ];
 
+const adminNavItems = [
+  { href: "/admin/ejecuciones", label: "Ejecuciones", icon: Shield },
+];
+
+interface SidebarProps {
+  rol?: string;
+}
+
 type Tienda = { id: number; nombre: string; direccion: string | null };
 
-export default function Sidebar() {
+export default function Sidebar({ rol }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -40,6 +51,9 @@ export default function Sidebar() {
   const [activa, setActiva] = useState<Tienda | null>(null);
   const [switching, setSwitching] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const isAdmin = rol === "admin";
+  const allNavItems = isAdmin ? [...navItems, ...adminNavItems] : navItems;
 
   useEffect(() => {
     async function cargarSucursales() {
@@ -179,7 +193,7 @@ export default function Sidebar() {
 
       {/* Nav */}
       <nav className="flex-1 space-y-2">
-        {navItems.map((item) => {
+        {allNavItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
           return (

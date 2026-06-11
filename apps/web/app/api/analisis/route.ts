@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
 
     let body: { nResults?: number } = {};
     try { body = await request.json(); } catch { }
-    const nResults = body.nResults || 10;
+    const nResults = body.nResults || 1;
 
     if (!usuario.empresaActivaId) {
       return NextResponse.json({ error: "El usuario no tiene una empresa activa" }, { status: 400 });

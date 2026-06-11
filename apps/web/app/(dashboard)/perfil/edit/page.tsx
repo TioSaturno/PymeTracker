@@ -34,11 +34,15 @@ export default function ProfileEditPage() {
         if (response.ok) {
           const result = await response.json();
           if (result.data) {
+            const tiendaActiva = result.data.tiendas?.find(
+              (t: { id: number }) => t.id === result.data.tiendaActivaId
+            );
+            
             setFormData({
               nombre: result.data.nombre || "",
               rut: result.data.rut || "",
               rubro: result.data.rubro || "",
-              direccion: result.data.direccion || "",
+              direccion: tiendaActiva?.direccion || result.data.direccion || "",
               comuna: result.data.comuna || "",
               telefono: result.data.telefono || "",
               diaSeleccionado: result.data.diaSeleccionado || "lunes",

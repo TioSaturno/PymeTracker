@@ -137,16 +137,45 @@ export const inventarios = pgTable("inventarios", {
 });
 
 // ─────────────────────────────────────────────
+// 7. TICKETS 
+// ─────────────────────────────────────────────
+export const tickets = pgTable("tickets", {
+  id: serial("id").primaryKey(),
+  usuarioId: integer("usuario_id").references(() => usuarios.id, { onDelete: "cascade" }),
+  empresaId: integer("empresa_id").references(() => empresas.id, { onDelete: "cascade" }),
+  asunto: varchar("asunto", { length: 255 }).notNull(),
+  descripcion: text("descripcion").notNull(),
+  status: varchar("status", { length: 20 }).default("abierto"),
+  prioridad: varchar("prioridad", { length: 20 }).default("media"),
+  fechaCreacion: timestamp("fecha_creacion").defaultNow(),
+  fechaActualizacion: timestamp("fecha_actualizacion").defaultNow().$onUpdate(() => new Date()),
+});
+
+// ─────────────────────────────────────────────
 // RELACIONES
 // ─────────────────────────────────────────────
 export const empresasRelations = relations(empresas, ({ many }) => ({
   usuarios: many(usuarios),
   tiendas: many(tiendas),
+  usuarioEmpresas: many(usuarioEmpresas),
+}));
+
+export const usuarioEmpresasRelations = relations(usuarioEmpresas, ({ one }) => ({
+  usuario: one(usuarios, {
+    fields: [usuarioEmpresas.usuarioId],
+    references: [usuarios.id],
+  }),
+  empresa: one(empresas, {
+    fields: [usuarioEmpresas.empresaId],
+    references: [empresas.id],
+  }),
 }));
 
 export const usuariosRelations = relations(usuarios, ({ many }) => ({
+  usuarioEmpresas: many(usuarioEmpresas),
   analisis: many(analisis),
   suscripciones: many(suscripciones),
+  tickets: many(tickets),
 }));
 
 export const ciudadesRelations = relations(ciudades, ({ many }) => ({
@@ -191,6 +220,17 @@ export const inventariosRelations = relations(inventarios, ({ one }) => ({
   }),
 }));
 
+export const ticketsRelations = relations(tickets, ({ one }) => ({
+  usuario: one(usuarios, {
+    fields: [tickets.usuarioId],
+    references: [usuarios.id],
+  }),
+  empresa: one(empresas, {
+    fields: [tickets.empresaId],
+    references: [empresas.id],
+  }),
+}));
+
 // ─────────────────────────────────────────────
 // TIPOS INFERIDOS (para uso en la app)
 // ─────────────────────────────────────────────
@@ -214,3 +254,6 @@ export type NuevaSuscripcion = typeof suscripciones.$inferInsert;
 
 export type Inventario = typeof inventarios.$inferSelect;
 export type NuevoInventario = typeof inventarios.$inferInsert;
+
+export type Ticket = typeof tickets.$inferSelect;
+export type NuevoTicket = typeof tickets.$inferInsert;

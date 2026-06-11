@@ -13,6 +13,9 @@ export async function GET(request: NextRequest) {
       id: usuario.id,
       nombre: usuario.nombre || null,
       email: usuario.email,
+      rol: usuario.rol,
+      empresaActivaId: usuario.empresaActivaId,
+      tiendaActivaId: usuario.tiendaActivaId,
     },
   });
 }
