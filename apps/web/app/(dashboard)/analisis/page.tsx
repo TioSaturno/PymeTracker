@@ -24,9 +24,9 @@ export default function AnalisisPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch("/api/analytics?tiendaId=1");
+        const response = await fetch("/api/analytics");
         if (!response.ok) {
-          throw new Error("Error al obtener los datos");
+          throw new Error("Aún no hay datos de análisis disponibles. Ejecuta tu primer análisis para ver gráficas.");
         }
         const result = await response.json();
         setData(result);
@@ -54,8 +54,20 @@ export default function AnalisisPage() {
             Cargando datos...
           </div>
         ) : error ? (
-          <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#ffdad6] w-full p-8 shadow-[0_8px_30px_rgb(186,26,26,0.04)] text-center font-semibold text-[#ba1a1a]">
-            {error}
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] w-full p-8 text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+            <p className="text-5xl mb-2">🔍</p>
+            <h2 className="text-xl font-bold text-[#1b1c1c] mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              Aún no ejecutas tu primer análisis
+            </h2>
+            <p className="text-sm text-[#4f4441] mb-6">
+              Ejecuta un análisis de competencia para ver gráficas comparativas de precios, categorías y tendencias.
+            </p>
+            <a
+              href="/analisis/historial"
+              className="inline-block bg-[#725950] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)]"
+            >
+              Ir a ejecutar análisis →
+            </a>
           </div>
         ) : (
           <div className="flex flex-col gap-8 w-full">

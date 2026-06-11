@@ -240,29 +240,44 @@ export default function Competencia() {
           )}
 
           {!loading && error && (
-            <div className="border border-[#ffdad6] bg-white/80 backdrop-blur-xl rounded-2xl p-6 shadow-[0_4px_16px_rgb(186,26,26,0.03)]">
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#ba1a1a] m-0 mb-1">
-                ERROR
+            <div className="border border-[#e4e2e2] bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
+              <p className="text-5xl mb-2">🔍</p>
+              <h2 className="text-xl font-bold text-[#1b1c1c] mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                Aún no ejecutas tu primer análisis
+              </h2>
+              <p className="text-sm text-[#4f4441] mb-6">
+                Ejecuta un análisis de competencia para descubrir quiénes son tus competidores y cómo se comparan contigo.
               </p>
-              <p className="text-sm font-medium text-[#1b1c1c]">
-                {error}
-              </p>
+              <a
+                href="/analisis/historial"
+                className="inline-block bg-[#725950] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)]"
+              >
+                Ir a ejecutar análisis →
+              </a>
             </div>
           )}
 
           {!loading && !error && filtradas.length === 0 && (
             <div className="border border-[#e4e2e2] bg-white/80 backdrop-blur-xl rounded-2xl p-8 text-center shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
-              <p className="text-2xl m-0">🔍</p>
-              <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mt-2 m-0">
+              <p className="text-5xl mb-2">🔍</p>
+              <h2 className="text-xl font-bold text-[#1b1c1c] mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 {empresas.length === 0
-                  ? "SIN DATOS DISPONIBLES"
+                  ? "Aún no ejecutas tu primer análisis"
                   : "SIN RESULTADOS"}
-              </p>
-              <p className="text-sm text-[#4f4441] mt-2 m-0">
+              </h2>
+              <p className="text-sm text-[#4f4441] mb-6">
                 {empresas.length === 0
-                  ? "No se encontró información de competencia para esta tienda."
+                  ? "Ejecuta un análisis de competencia para descubrir quiénes son tus competidores y cómo se comparan contigo."
                   : `No hay negocios que coincidan con "${search}".`}
               </p>
+              {empresas.length === 0 && (
+                <a
+                  href="/analisis/historial"
+                  className="inline-block bg-[#725950] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)]"
+                >
+                  Ir a ejecutar análisis →
+                </a>
+              )}
             </div>
           )}
 

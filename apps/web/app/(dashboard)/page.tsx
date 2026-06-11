@@ -275,16 +275,44 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <div className="p-10 text-center text-[#ba1a1a]" style={{ fontFamily: "'Inter', sans-serif" }}>
-        Error: {error}
+      <div className="min-h-screen bg-[#fbf9f8] flex flex-col items-center justify-center p-10" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <div className="max-w-md text-center space-y-6">
+          <p className="text-5xl mb-2">🔍</p>
+          <h2 className="text-xl font-bold text-[#1b1c1c]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            Aún no ejecutas tu primer análisis
+          </h2>
+          <p className="text-sm text-[#4f4441]">
+            Ejecuta un análisis de competencia para ver cómo se compara tu negocio con otros del rubro.
+          </p>
+          <a
+            href="/analisis/historial"
+            className="inline-block bg-[#725950] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)]"
+          >
+            Ir a ejecutar análisis →
+          </a>
+        </div>
       </div>
     );
   }
 
   if (!datos) {
     return (
-      <div className="p-10 text-center text-[#4f4441]" style={{ fontFamily: "'Inter', sans-serif" }}>
-        No hay datos disponibles.
+      <div className="min-h-screen bg-[#fbf9f8] flex flex-col items-center justify-center p-10" style={{ fontFamily: "'Inter', sans-serif" }}>
+        <div className="max-w-md text-center space-y-6">
+          <p className="text-5xl mb-2">🔍</p>
+          <h2 className="text-xl font-bold text-[#1b1c1c]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            Aún no ejecutas tu primer análisis
+          </h2>
+          <p className="text-sm text-[#4f4441]">
+            Ejecuta un análisis de competencia para ver cómo se compara tu negocio con otros del rubro.
+          </p>
+          <a
+            href="/analisis/historial"
+            className="inline-block bg-[#725950] text-white px-6 py-3 rounded-xl font-semibold hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)]"
+          >
+            Ir a ejecutar análisis →
+          </a>
+        </div>
       </div>
     );
   }

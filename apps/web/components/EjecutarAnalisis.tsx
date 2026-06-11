@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 
 const STATUS_MESSAGES: Record<string, string> = {
   pending: "Iniciando análisis...",
@@ -20,7 +21,26 @@ export default function EjecutarAnalisis() {
   const [ejecutando, setEjecutando] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [perfilCompleto, setPerfilCompleto] = useState<boolean | null>(null);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    async function checkProfile() {
+      try {
+        const res = await fetch("/api/empresa/perfil");
+        if (!res.ok) { setPerfilCompleto(false); return; }
+        const { data } = await res.json();
+        if (!data) { setPerfilCompleto(false); return; }
+        const tieneRubro = !!data.rubro;
+        const tieneDireccion = !!(data.direccion || data.comuna);
+        const tieneTienda = !!(data.tiendas?.length > 0);
+        setPerfilCompleto(tieneRubro && tieneDireccion && tieneTienda);
+      } catch {
+        setPerfilCompleto(false);
+      }
+    }
+    checkProfile();
+  }, []);
 
   const detenerPolling = useCallback(() => {
     if (pollingRef.current) {
@@ -77,13 +97,30 @@ export default function EjecutarAnalisis() {
 
   return (
     <div className="w-full">
-      {!ejecutando && !error && (
+      {!ejecutando && !error && perfilCompleto === true && (
         <button
           onClick={iniciarAnalisis}
           className="w-full bg-[#1b1c1c] text-white font-semibold py-3 px-6 rounded-xl hover:bg-[#333] transition-colors shadow-[0_8px_30px_rgb(0,0,0,0.12)] cursor-pointer"
         >
           Ejecutar Nuevo Análisis
         </button>
+      )}
+
+      {!ejecutando && !error && perfilCompleto === false && (
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-center space-y-4">
+          <button
+            disabled
+            className="w-full bg-[#d3c3be] text-white font-semibold py-3 px-6 rounded-xl cursor-not-allowed opacity-60"
+          >
+            Ejecutar Nuevo Análisis
+          </button>
+          <p className="text-xs text-[#817470]">
+            Debes completar tu perfil antes de ejecutar un análisis.{' '}
+            <Link href="/perfil/edit" className="text-[#725950] font-semibold hover:underline">
+              Completar perfil →
+            </Link>
+          </p>
+        </div>
       )}
 
       {ejecutando && (
@@ -99,13 +136,22 @@ export default function EjecutarAnalisis() {
 
       {error && !ejecutando && (
         <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#ffdad6] p-8 shadow-[0_8px_30px_rgb(186,26,26,0.04)] text-center">
-          <p className="text-[#ba1a1a] font-medium mb-4">{error}</p>
-          <button
-            onClick={iniciarAnalisis}
-            className="bg-[#1b1c1c] text-white font-semibold py-2 px-6 rounded-xl hover:bg-[#333] transition-colors cursor-pointer"
-          >
-            Reintentar
-          </button>
+          <p className="text-[#ba1a1a] font-medium mb-1">{error}</p>
+          {perfilCompleto === true ? (
+            <button
+              onClick={iniciarAnalisis}
+              className="bg-[#1b1c1c] text-white font-semibold py-2 px-6 rounded-xl hover:bg-[#333] transition-colors cursor-pointer mt-4"
+            >
+              Reintentar
+            </button>
+          ) : (
+            <p className="text-xs text-[#817470] mt-4">
+              Completa tu perfil antes de reintentar.{' '}
+              <Link href="/perfil/edit" className="text-[#725950] font-semibold hover:underline">
+                Ir a perfil →
+              </Link>
+            </p>
+          )}
         </div>
       )}
     </div>
