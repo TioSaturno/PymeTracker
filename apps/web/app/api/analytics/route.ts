@@ -1,4 +1,5 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth } from "@/lib/auth";
 import { db } from '@pymetracker/db/create-client';
 import { analisis } from '@pymetracker/db/schema';
 import { eq } from 'drizzle-orm';
@@ -23,11 +24,18 @@ interface DeepSeekResponse {
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    const usuario = await requireAuth(request);
+    if (usuario instanceof NextResponse) return usuario;
+
     const { searchParams } = new URL(request.url);
     const tiendaIdParam = searchParams.get('tiendaId');
-    const tiendaId = tiendaIdParam ? parseInt(tiendaIdParam, 10) : 1;
+    const tiendaId = tiendaIdParam ? parseInt(tiendaIdParam, 10) : usuario.tiendaActivaId;
+
+    if (!tiendaId) {
+      return NextResponse.json({ error: 'No hay una sucursal activa' }, { status: 400 });
+    }
 
     const allRecords = await db.select()
       .from(analisis)

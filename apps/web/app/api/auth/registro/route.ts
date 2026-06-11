@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pymetracker/db/create-client";
-import { usuarios, empresas, usuarioEmpresas } from "@pymetracker/db/schema";
+import { usuarios, empresas, tiendas, usuarioEmpresas } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { SignJWT } from "jose";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-in-production";
 
@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
     const [nuevoUsuario] = await db.insert(usuarios).values({ nombre, email, passwordHash }).returning();
 
     let empresaActivaId: number | null = null;
+    let tiendaActivaId: number | null = null;
 
     if (empresaNombre) {
       const [nuevaEmpresa] = await db.insert(empresas).values({
@@ -41,17 +42,30 @@ export async function POST(request: NextRequest) {
         empresaId: nuevaEmpresa.id,
         rol: "admin",
       });
+
+      // Crear tienda por defecto con el mismo nombre
+      const [nuevaTienda] = await db.insert(tiendas).values({
+        nombre: empresaNombre,
+        empresaId: nuevaEmpresa.id,
+      }).returning();
+      tiendaActivaId = nuevaTienda.id;
     }
 
-    const token = jwt.sign(
-      { id: nuevoUsuario.id, email: nuevoUsuario.email, rol: nuevoUsuario.rol, empresaActivaId },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const secret = new TextEncoder().encode(JWT_SECRET);
+    const token = await new SignJWT({
+      id: nuevoUsuario.id,
+      email: nuevoUsuario.email,
+      rol: nuevoUsuario.rol,
+      empresaActivaId,
+      tiendaActivaId,
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(secret);
 
     const response = NextResponse.json({
       data: {
-        usuario: { id: nuevoUsuario.id, nombre: nuevoUsuario.nombre, email: nuevoUsuario.email, rol: nuevoUsuario.rol, empresaActivaId },
+        usuario: { id: nuevoUsuario.id, nombre: nuevoUsuario.nombre, email: nuevoUsuario.email, rol: nuevoUsuario.rol, empresaActivaId, tiendaActivaId },
       },
     }, { status: 201 });
 

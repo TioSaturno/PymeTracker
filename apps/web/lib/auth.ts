@@ -14,7 +14,8 @@ export async function getUsuarioFromRequest(request: NextRequest) {
       id: number;
       email: string;
       rol: string;
-      empresaActivaId: number | null; // antes era empresaId
+      empresaActivaId: number | null;
+      tiendaActivaId: number | null;
     };
   } catch {
     return null;

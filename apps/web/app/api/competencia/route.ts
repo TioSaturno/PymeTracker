@@ -10,9 +10,17 @@ export async function GET(request: NextRequest) {
     if (usuario instanceof NextResponse) return usuario;
 
     const { searchParams } = new URL(request.url);
-    let tiendaId = searchParams.get("tiendaId");
+    let tiendaId: number | null = searchParams.get("tiendaId")
+      ? Number(searchParams.get("tiendaId"))
+      : null;
     let nombreEmpresaActiva: string | null = null;
 
+    // Si no viene por query, usar tiendaActivaId del JWT
+    if (!tiendaId && usuario.tiendaActivaId) {
+      tiendaId = usuario.tiendaActivaId;
+    }
+
+    // Si aún no hay, derivar desde empresaActivaId
     if (!tiendaId && usuario.empresaActivaId) {
       const [empresasData, tiendasData] = await Promise.all([
         db
@@ -29,7 +37,7 @@ export async function GET(request: NextRequest) {
 
       const firstTienda = tiendasData[0];
       nombreEmpresaActiva = empresasData[0]?.nombre ?? null;
-      if (firstTienda) tiendaId = String(firstTienda.id);
+      if (firstTienda) tiendaId = firstTienda.id;
     } else if (usuario.empresaActivaId) {
       const [empresaData] = await db
         .select({ nombre: empresas.nombre })
@@ -42,7 +50,6 @@ export async function GET(request: NextRequest) {
     if (!tiendaId) {
       return NextResponse.json({ error: "No se encontró una tienda asociada" }, { status: 400 });
     }
-
     const [latest] = await db
       .select({
         id: analisis.id,
@@ -53,7 +60,7 @@ export async function GET(request: NextRequest) {
       .from(analisis)
       .where(
         and(
-          eq(analisis.tiendaId, Number(tiendaId)),
+          eq(analisis.tiendaId, tiendaId),
           eq(analisis.usuarioId, usuario.id),
           eq(analisis.status, "completed"),
         ),
@@ -114,8 +121,8 @@ export async function GET(request: NextRequest) {
         },
       }));
 
-    return NextResponse.json({
-      empresas: competidores,
+    return NextResponse.json({ 
+      empresas: competidores, 
       total: competidores.length,
       miNegocio: miNegocio
         ? {

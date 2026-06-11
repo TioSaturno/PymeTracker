@@ -51,13 +51,13 @@ export async function GET(
     }
  
     
-    if (usuario.empresaId) {
-      const esPropietario = await verificarPropiedad(itemId, usuario.empresaId);
+    if (usuario.empresaActivaId) {
+      const esPropietario = await verificarPropiedad(itemId, usuario.empresaActivaId);
       if (!esPropietario) {
         return NextResponse.json({ error: "No autorizado" }, { status: 403 });
       }
     }
- 
+
     return NextResponse.json({ data: item });
   } catch (error) {
     console.error("[GET /api/inventario/:id]", error);
@@ -99,13 +99,13 @@ export async function PUT(
     }
  
     
-    if (usuario.empresaId) {
-      const esPropietario = await verificarPropiedad(itemId, usuario.empresaId);
+    if (usuario.empresaActivaId) {
+      const esPropietario = await verificarPropiedad(itemId, usuario.empresaActivaId);
       if (!esPropietario) {
         return NextResponse.json({ error: "No autorizado" }, { status: 403 });
       }
     }
- 
+
     const body = await request.json();
     const { nombre, categoria, precio, productoCodigo } = body;
  
@@ -190,13 +190,13 @@ export async function DELETE(
     }
  
     
-    if (usuario.empresaId) {
-      const esPropietario = await verificarPropiedad(itemId, usuario.empresaId);
+    if (usuario.empresaActivaId) {
+      const esPropietario = await verificarPropiedad(itemId, usuario.empresaActivaId);
       if (!esPropietario) {
         return NextResponse.json({ error: "No autorizado" }, { status: 403 });
       }
     }
- 
+
     await db.delete(inventarios).where(eq(inventarios.id, itemId));
  
     return NextResponse.json({

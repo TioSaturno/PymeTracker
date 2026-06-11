@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pymetracker/db/create-client";
-import { usuarios, usuarioEmpresas } from "@pymetracker/db/schema";
+import { usuarios, tiendas, usuarioEmpresas } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { SignJWT } from "jose";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-in-production";
 
@@ -13,37 +13,21 @@ export async function POST(request: NextRequest) {
     const { email, password } = body;
 
     if (!email || !password) {
-      return NextResponse.json(
-        { error: "Email y password son requeridos" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Email y password son requeridos" }, { status: 400 });
     }
 
-    const result = await db
-      .select()
-      .from(usuarios)
-      .where(eq(usuarios.email, email))
-      .limit(1);
-
+    const result = await db.select().from(usuarios).where(eq(usuarios.email, email)).limit(1);
     if (result.length === 0) {
-      return NextResponse.json(
-        { error: "Credenciales inválidas" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Credenciales inválidas" }, { status: 401 });
     }
 
     const usuario = result[0];
-
     const passwordValid = await bcrypt.compare(password, usuario.passwordHash);
-
     if (!passwordValid) {
-      return NextResponse.json(
-        { error: "Credenciales inválidas" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Credenciales inválidas" }, { status: 401 });
     }
 
-    // Buscar todas las empresas del usuario y tomar la primera como activa
+    // Buscar empresas del usuario y tomar la primera como activa
     const misEmpresas = await db
       .select({ empresaId: usuarioEmpresas.empresaId })
       .from(usuarioEmpresas)
@@ -51,16 +35,28 @@ export async function POST(request: NextRequest) {
 
     const empresaActivaId = misEmpresas[0]?.empresaId ?? null;
 
-    const token = jwt.sign(
-      {
-        id: usuario.id,
-        email: usuario.email,
-        rol: usuario.rol,
-        empresaActivaId,
-      },
-      JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    // Buscar primera tienda de la empresa activa
+    let tiendaActivaId: number | null = null;
+    if (empresaActivaId) {
+      const [primeraTienda] = await db
+        .select({ id: tiendas.id })
+        .from(tiendas)
+        .where(eq(tiendas.empresaId, empresaActivaId))
+        .limit(1);
+      tiendaActivaId = primeraTienda?.id ?? null;
+    }
+
+    const secret = new TextEncoder().encode(JWT_SECRET);
+    const token = await new SignJWT({
+      id: usuario.id,
+      email: usuario.email,
+      rol: usuario.rol,
+      empresaActivaId,
+      tiendaActivaId,
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("7d")
+      .sign(secret);
 
     const response = NextResponse.json({
       data: {
@@ -70,6 +66,7 @@ export async function POST(request: NextRequest) {
           email: usuario.email,
           rol: usuario.rol,
           empresaActivaId,
+          tiendaActivaId,
         },
       },
     });
@@ -85,9 +82,6 @@ export async function POST(request: NextRequest) {
     return response;
   } catch (error) {
     console.error("[POST /api/auth/login]", error);
-    return NextResponse.json(
-      { error: "Error al iniciar sesión" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error al iniciar sesión" }, { status: 500 });
   }
 }

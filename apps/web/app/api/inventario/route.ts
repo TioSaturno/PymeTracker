@@ -18,11 +18,11 @@ export async function GET(request: NextRequest) {
    
     let tiendaId: number | null = tiendaIdParam ? parseInt(tiendaIdParam) : null;
 
-    if (!tiendaId && usuario.empresaId) {
+    if (!tiendaId && usuario.empresaActivaId) {
       const [firstTienda] = await db
         .select({ id: tiendas.id })
         .from(tiendas)
-        .where(eq(tiendas.empresaId, usuario.empresaId))
+        .where(eq(tiendas.empresaId, usuario.empresaActivaId))
         .limit(1);
       if (firstTienda) tiendaId = firstTienda.id;
     }
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    
+
     const condiciones = [eq(inventarios.tiendaId, tiendaId)];
 
     if (categoria) {
@@ -113,11 +113,11 @@ export async function POST(request: NextRequest) {
     
     let tiendaId: number | null = bodyTiendaId ? parseInt(bodyTiendaId) : null;
 
-    if (!tiendaId && usuario.empresaId) {
+    if (!tiendaId && usuario.empresaActivaId) {
       const [firstTienda] = await db
         .select({ id: tiendas.id })
         .from(tiendas)
-        .where(eq(tiendas.empresaId, usuario.empresaId))
+        .where(eq(tiendas.empresaId, usuario.empresaActivaId))
         .limit(1);
       if (firstTienda) tiendaId = firstTienda.id;
     }

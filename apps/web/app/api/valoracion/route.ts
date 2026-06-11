@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
   try {
     const usuario = await requireAuth(request);
     if (usuario instanceof NextResponse) return usuario;
-    if (!usuario.empresaId) {
+    if (!usuario.empresaActivaId) {
       return NextResponse.json(
         { error: "No tienes una empresa asociada" },
         { status: 400 }
@@ -93,12 +93,12 @@ export async function GET(request: NextRequest) {
       db
         .select({ nombre: empresas.nombre })
         .from(empresas)
-        .where(eq(empresas.id, usuario.empresaId))
+        .where(eq(empresas.id, usuario.empresaActivaId))
         .limit(1),
       db
         .select({ id: tiendas.id })
         .from(tiendas)
-        .where(eq(tiendas.empresaId, usuario.empresaId))
+        .where(eq(tiendas.empresaId, usuario.empresaActivaId))
         .limit(1),
     ]);
     const empresa = empresaData[0];

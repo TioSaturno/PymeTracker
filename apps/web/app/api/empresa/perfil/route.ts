@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
       .from(tiendas)
       .where(eq(tiendas.empresaId, usuario.empresaActivaId));
 
-    return NextResponse.json({ data: { ...empresa, tiendas: tiendasList } });
+    return NextResponse.json({ data: { ...empresa, tiendas: tiendasList, tiendaActivaId: usuario.tiendaActivaId } });
   } catch (error) {
     return NextResponse.json({ error: "Error al cargar empresa" }, { status: 500 });
   }
