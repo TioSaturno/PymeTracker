@@ -62,8 +62,10 @@ export async function POST(request: NextRequest) {
       {
         id: nuevoUsuario.id,
         email: nuevoUsuario.email,
+        nombre: nuevoUsuario.nombre,
         rol: nuevoUsuario.rol,
         empresaId: nuevoUsuario.empresaId,
+        planActivo: false,
       },
       JWT_SECRET,
       { expiresIn: "7d" }

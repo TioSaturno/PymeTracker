@@ -4,6 +4,7 @@ import { usuarios } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { tieneAccesoValido } from "@/lib/auth";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-in-production";
 
@@ -43,12 +44,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const planActivo = await tieneAccesoValido(usuario.id);
+
     const token = jwt.sign(
       {
         id: usuario.id,
         email: usuario.email,
+        nombre: usuario.nombre,
         rol: usuario.rol,
         empresaId: usuario.empresaId,
+        planActivo,
       },
       JWT_SECRET,
       { expiresIn: "7d" }
