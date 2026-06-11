@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, MapPin, Phone, Pencil, X } from "lucide-react";
+import { Building2, MapPin, Phone, Calendar, Pencil, X } from "lucide-react";
 import { CATEGORIAS_LOCALES } from "@/types/categories";
 import PageHeader from "@/app/components/PageHeader";
 
@@ -19,6 +19,7 @@ export default function ProfileEditPage() {
     direccion: "",
     comuna: "",
     telefono: "",
+    diaSeleccionado: "lunes",
   });
 
   useEffect(() => {
@@ -35,6 +36,7 @@ export default function ProfileEditPage() {
               direccion: result.data.direccion || "",
               comuna: result.data.comuna || "",
               telefono: result.data.telefono || "",
+              diaSeleccionado: result.data.diaSeleccionado || "lunes",
             });
           }
         }
@@ -253,6 +255,43 @@ export default function ProfileEditPage() {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Sección: Día de Análisis */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 p-8 shadow-[0_4px_16px_rgb(0,0,0,0.03)]">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-[#fedcd0]/50 rounded-xl">
+                <Calendar className="h-5 w-5 text-[#725950]" />
+              </div>
+              <h2
+                className="text-lg font-semibold text-[#1b1c1c]"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+              >
+                Día de Análisis
+              </h2>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-wider text-[#817470] block">
+                Día de la semana para ejecutar el análisis automático
+              </label>
+              <select
+                disabled={isReadOnly}
+                className={`${inputClass(isReadOnly)} appearance-none cursor-pointer`}
+                value={formData.diaSeleccionado}
+                onChange={(e) =>
+                  setFormData({ ...formData, diaSeleccionado: e.target.value })
+                }
+              >
+                <option value="lunes">Lunes</option>
+                <option value="martes">Martes</option>
+                <option value="miercoles">Miércoles</option>
+                <option value="jueves">Jueves</option>
+                <option value="viernes">Viernes</option>
+                <option value="sabado">Sábado</option>
+                <option value="domingo">Domingo</option>
+              </select>
             </div>
           </div>
 

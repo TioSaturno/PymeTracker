@@ -1,5 +1,5 @@
 import { db } from "@pymetracker/db/create-client";
-import { analisis } from "@pymetracker/db/schema";
+import { analisis, usuarios } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function updateStatus(
@@ -28,4 +28,29 @@ export async function saveInDb(datos: any) {
   });
 
   console.log("✅ Datos guardados en la base de datos");
+}
+
+export async function updateProcesado(
+  analisisId: number,
+  payloadProcesado: any,
+) {
+  await db
+    .update(analisis)
+    .set({ payloadProcesado, procesado: true })
+    .where(eq(analisis.id, analisisId));
+
+  console.log("✅ Payload procesado guardado");
+}
+
+export async function obtenerEmailUsuario(
+  analisisId: number,
+): Promise<string | null> {
+  const result = await db
+    .select({ email: usuarios.email })
+    .from(analisis)
+    .innerJoin(usuarios, eq(analisis.usuarioId, usuarios.id))
+    .where(eq(analisis.id, analisisId))
+    .limit(1);
+
+  return result.length > 0 ? result[0].email : null;
 }

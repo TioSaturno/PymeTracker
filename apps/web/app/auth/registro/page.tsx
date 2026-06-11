@@ -5,23 +5,26 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function RegistroPage() {
-  const [nombre, setNombre] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    const form = new FormData(e.currentTarget);
+    const nombre = form.get("nombre") as string;
+    const email = form.get("email") as string;
+    const password = form.get("password") as string;
+    const empresaNombre = form.get("empresaNombre") as string;
 
     try {
       const res = await fetch("/api/auth/registro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, email, password }),
+        body: JSON.stringify({ nombre, email, password, empresaNombre }),
       });
 
       const json = await res.json();
@@ -30,7 +33,7 @@ export default function RegistroPage() {
         throw new Error(json.error || "Error al registrarse");
       }
 
-      router.push("/");
+      router.push("/perfil");
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -71,9 +74,8 @@ export default function RegistroPage() {
             <input
               type="text"
               id="nombre"
+              name="nombre"
               placeholder="Juan Pérez"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
               required
               className="w-full border border-[#e4e2e2] rounded-xl px-4 py-3 text-sm text-[#1b1c1c] bg-[#f5f3f3]/50 outline-none placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/20 transition-all duration-200"
             />
@@ -89,9 +91,8 @@ export default function RegistroPage() {
             <input
               type="email"
               id="email"
+              name="email"
               placeholder="correo@empresa.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full border border-[#e4e2e2] rounded-xl px-4 py-3 text-sm text-[#1b1c1c] bg-[#f5f3f3]/50 outline-none placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/20 transition-all duration-200"
             />
@@ -107,10 +108,25 @@ export default function RegistroPage() {
             <input
               type="password"
               id="password"
+              name="password"
               placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               required
+              className="w-full border border-[#e4e2e2] rounded-xl px-4 py-3 text-sm text-[#1b1c1c] bg-[#f5f3f3]/50 outline-none placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/20 transition-all duration-200"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="empresaNombre"
+              className="block text-sm font-semibold text-[#4f4441] mb-2"
+            >
+              Nombre de tu Empresa
+            </label>
+            <input
+              type="text"
+              id="empresaNombre"
+              name="empresaNombre"
+              placeholder="Mi Pyme SpA"
               className="w-full border border-[#e4e2e2] rounded-xl px-4 py-3 text-sm text-[#1b1c1c] bg-[#f5f3f3]/50 outline-none placeholder:text-[#817470] focus:border-[#725950] focus:ring-2 focus:ring-[#725950]/20 transition-all duration-200"
             />
           </div>

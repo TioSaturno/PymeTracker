@@ -1,6 +1,6 @@
 {
-  "id": "020e285a-2ce6-498d-a845-33ca02f53ae7",
-  "prevId": "9333e61a-55c4-486c-800f-13e14ae1762c",
+  "id": "cd8a3f0d-9dc7-4594-9f68-df2a057f2020",
+  "prevId": "d2a470be-12ae-4373-a3cc-c331b63f02bf",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -195,6 +195,13 @@
           "primaryKey": false,
           "notNull": false
         },
+        "dia_seleccionado": {
+          "name": "dia_seleccionado",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'lunes'"
+        },
         "fecha_registro": {
           "name": "fecha_registro",
           "type": "timestamp",
@@ -205,110 +212,6 @@
       },
       "indexes": {},
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
-    "public.suscripciones": {
-      "name": "suscripciones",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "serial",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "usuario_id": {
-          "name": "usuario_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "plan": {
-          "name": "plan",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'premium'"
-        },
-        "precio": {
-          "name": "precio",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "moneda": {
-          "name": "moneda",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'CLP'"
-        },
-        "estado": {
-          "name": "estado",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'activa'"
-        },
-        "fecha_inicio": {
-          "name": "fecha_inicio",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "fecha_fin": {
-          "name": "fecha_fin",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "fecha_cancelacion": {
-          "name": "fecha_cancelacion",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "metodo_pago": {
-          "name": "metodo_pago",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "referencia_pago": {
-          "name": "referencia_pago",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": false,
-          "default": "now()"
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "suscripciones_usuario_id_usuarios_id_fk": {
-          "name": "suscripciones_usuario_id_usuarios_id_fk",
-          "tableFrom": "suscripciones",
-          "tableTo": "usuarios",
-          "columnsFrom": [
-            "usuario_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -392,6 +295,78 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.usuario_empresas": {
+      "name": "usuario_empresas",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "empresa_id": {
+          "name": "empresa_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rol": {
+          "name": "rol",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'admin'"
+        },
+        "fecha_union": {
+          "name": "fecha_union",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "usuario_empresas_usuario_id_usuarios_id_fk": {
+          "name": "usuario_empresas_usuario_id_usuarios_id_fk",
+          "tableFrom": "usuario_empresas",
+          "tableTo": "usuarios",
+          "columnsFrom": [
+            "usuario_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "usuario_empresas_empresa_id_empresas_id_fk": {
+          "name": "usuario_empresas_empresa_id_empresas_id_fk",
+          "tableFrom": "usuario_empresas",
+          "tableTo": "empresas",
+          "columnsFrom": [
+            "empresa_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.usuarios": {
       "name": "usuarios",
       "schema": "",
@@ -401,12 +376,6 @@
           "type": "serial",
           "primaryKey": true,
           "notNull": true
-        },
-        "empresa_id": {
-          "name": "empresa_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false
         },
         "nombre": {
           "name": "nombre",
@@ -433,12 +402,6 @@
           "notNull": false,
           "default": "'admin'"
         },
-        "flow_customer_id": {
-          "name": "flow_customer_id",
-          "type": "varchar(255)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "fecha_creacion": {
           "name": "fecha_creacion",
           "type": "timestamp",
@@ -448,21 +411,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "usuarios_empresa_id_empresas_id_fk": {
-          "name": "usuarios_empresa_id_empresas_id_fk",
-          "tableFrom": "usuarios",
-          "tableTo": "empresas",
-          "columnsFrom": [
-            "empresa_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "usuarios_email_unique": {
