@@ -117,16 +117,24 @@ export const inventarios = pgTable("inventarios", {
 // RELACIONES
 // ─────────────────────────────────────────────
 export const empresasRelations = relations(empresas, ({ many }) => ({
-  usuarios: many(usuarios),
+  usuarioEmpresas: many(usuarioEmpresas),
   tiendas: many(tiendas),
 }));
 
-export const usuariosRelations = relations(usuarios, ({ one, many }) => ({
+export const usuariosRelations = relations(usuarios, ({ many }) => ({
+  usuarioEmpresas: many(usuarioEmpresas),
+  analisis: many(analisis),
+}));
+
+export const usuarioEmpresasRelations = relations(usuarioEmpresas, ({ one }) => ({
+  usuario: one(usuarios, {
+    fields: [usuarioEmpresas.usuarioId],
+    references: [usuarios.id],
+  }),
   empresa: one(empresas, {
-    fields: [usuarios.empresaId],
+    fields: [usuarioEmpresas.empresaId],
     references: [empresas.id],
   }),
-  analisis: many(analisis),
 }));
 
 export const ciudadesRelations = relations(ciudades, ({ many }) => ({
@@ -146,7 +154,7 @@ export const tiendasRelations = relations(tiendas, ({ one, many }) => ({
   inventarios: many(inventarios),
 }));
 
-export const analisisRelations = relations(analisis, ({ one }) => ({
+export const analisisRelations = relations(analisis, ({ one, many }) => ({
   tienda: one(tiendas, {
     fields: [analisis.tiendaId],
     references: [tiendas.id],
@@ -155,6 +163,7 @@ export const analisisRelations = relations(analisis, ({ one }) => ({
     fields: [analisis.usuarioId],
     references: [usuarios.id],
   }),
+  resumenes: many(resumenesResenas),
 }));
 
 export const inventariosRelations = relations(inventarios, ({ one }) => ({
@@ -163,6 +172,27 @@ export const inventariosRelations = relations(inventarios, ({ one }) => ({
     references: [tiendas.id],
   }),
 }));
+
+
+// 7. RESUMENES DE RESEÑAS (Cache de resúmenes generados por IA)
+// ─────────────────────────────────────────────
+export const resumenesResenas = pgTable("resumenes_resenas", {
+  id: serial("id").primaryKey(),
+  analisisId: integer("analisis_id").references(() => analisis.id, {
+    onDelete: "cascade",
+  }),
+  empresaNombre: varchar("empresa_nombre", { length: 255 }).notNull(),
+  resumen: text("resumen").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const resumenesResenasRelations = relations(resumenesResenas, ({ one }) => ({
+  analisis: one(analisis, {
+    fields: [resumenesResenas.analisisId],
+    references: [analisis.id],
+  }),
+}));
+
 
 // ─────────────────────────────────────────────
 // TIPOS INFERIDOS (para uso en la app)

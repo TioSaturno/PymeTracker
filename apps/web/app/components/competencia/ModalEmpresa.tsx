@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export interface Empresa {
   nombre: string;
@@ -63,7 +63,20 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
+function ResumenSkeleton() {
+  return (
+    <div className="space-y-2 animate-pulse">
+      <div className="h-3 bg-[#e4e2e2] rounded-full w-full" />
+      <div className="h-3 bg-[#e4e2e2] rounded-full w-[90%]" />
+      <div className="h-3 bg-[#e4e2e2] rounded-full w-[75%]" />
+    </div>
+  );
+}
+
 export default function ModalEmpresa({ empresa, onClose }: Props) {
+  const [resumen, setResumen] = useState<string | null>(null);
+  const [loadingResumen, setLoadingResumen] = useState(false);
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -83,6 +96,37 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
     };
   }, [empresa]);
 
+  useEffect(() => {
+    if (!empresa) {
+      setResumen(null);
+      return;
+    }
+
+    const reseñas = empresa.calificaciones?.ultimas_resenas ?? [];
+    if (reseñas.length === 0) return;
+
+    const analisisId = empresa._meta?.analisisId;
+    if (!analisisId || !empresa.nombre) return;
+
+    setLoadingResumen(true);
+    setResumen(null);
+    fetch("/api/resumen-resenas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        analisisId,
+        empresaNombre: empresa.nombre,
+        reseñas,
+      }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.resumen) setResumen(data.resumen);
+      })
+      .catch(console.error)
+      .finally(() => setLoadingResumen(false));
+  }, [empresa]);
+
   if (!empresa) return null;
 
   const { calificaciones, precios } = empresa;
@@ -96,6 +140,7 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
         className="bg-white/90 backdrop-blur-xl border border-[#e4e2e2] rounded-2xl w-full max-w-[680px] max-h-[90vh] flex flex-col shadow-[0_20px_60px_rgba(0,0,0,0.12)]"
         onClick={(e) => e.stopPropagation()}
       >
+        
         <div className="flex items-start justify-between border-b border-[#e4e2e2] p-5">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-1">
@@ -120,7 +165,9 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
           </button>
         </div>
 
+        
         <div className="overflow-y-auto flex-1">
+          
           <div className="p-5 border-b border-[#e4e2e2] grid grid-cols-2 gap-4">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-1">
@@ -172,6 +219,7 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
             </div>
           </div>
 
+          
           {precios && precios.length > 0 && (
             <div className="p-5 border-b border-[#e4e2e2]">
               <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-3">
@@ -195,28 +243,26 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
             </div>
           )}
 
+          
           <div className="p-5">
             <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-3">
-              ÚLTIMAS OPINIONES ({calificaciones.ultimas_resenas.length})
+              RESUMEN DE OPINIONES
             </p>
-            <div className="flex flex-col gap-3 max-h-[260px] overflow-y-auto pr-1">
-              {calificaciones.ultimas_resenas.map((resena, i) => (
-                <div
-                  key={i}
-                  className="border border-[#e4e2e2] rounded-xl p-4 bg-[#f5f3f3]/30"
-                >
-                  <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-2">
-                    RESEÑA #{i + 1}
-                  </p>
-                  <p className="text-sm text-[#1b1c1c] leading-relaxed m-0">
-                    {resena}
-                  </p>
-                </div>
-              ))}
+            <div className="border border-[#e4e2e2] rounded-xl p-4 bg-[#f5f3f3]/30 min-h-[80px]">
+              {loadingResumen ? (
+                <ResumenSkeleton />
+              ) : resumen ? (
+                <p className="text-sm text-[#1b1c1c] leading-relaxed">{resumen}</p>
+              ) : (
+                <p className="text-sm text-[#817470] italic">
+                  No hay un análisis de opiniones disponible para este competidor en este momento.
+                </p>
+              )}
             </div>
           </div>
         </div>
 
+        
         <div className="border-t border-[#e4e2e2] p-4 flex gap-3">
           <a
             href={empresa.google_maps_url}

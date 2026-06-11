@@ -22,6 +22,27 @@
       "when": 1780622690956,
       "tag": "0002_damp_overlord",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1781129276706,
+      "tag": "0003_public_hardball",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781158928442,
+      "tag": "0004_dazzling_ma_gnuci",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781178842470,
+      "tag": "0005_living_adam_destine",
+      "breakpoints": true
     }
   ]
 }

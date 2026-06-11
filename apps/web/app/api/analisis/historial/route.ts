@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pymetracker/db/create-client";
 import { analisis } from "@pymetracker/db/schema";
-import { desc } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
+import { requireAuth } from "@/lib/auth";
 
 interface Busqueda {
   tema: string;
@@ -57,9 +58,13 @@ interface Execution {
 
 export async function GET(request: NextRequest) {
   try {
+    const usuario = await requireAuth(request);
+    if (usuario instanceof NextResponse) return usuario;
+
     const result = await db
       .select()
       .from(analisis)
+      .where(eq(analisis.usuarioId, usuario.id))
       .orderBy(desc(analisis.fechaEjecucion))
       .limit(8);
 

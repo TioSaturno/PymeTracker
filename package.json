@@ -8,7 +8,7 @@
     "apps/*",
     "shared/*"
   ],
-  "scripts": {
+  "scripts": { 
     "dev:web": "cross-env NEXT_IGNORE_INCORRECT_LOCKFILE=1 npm run dev --workspace=apps/web",
     "dev:scraper": "npm run start:server --workspace=apps/scraping",
     "dev:all": "concurrently --kill-others -n db,web,scraper \"docker compose -f shared/db/docker-compose.yml up\" \"npm run dev:web\" \"npm run dev:scraper\"",
