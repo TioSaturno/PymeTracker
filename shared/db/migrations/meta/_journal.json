@@ -8,6 +8,20 @@
       "when": 1778989126048,
       "tag": "0000_cool_power_man",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780799262741,
+      "tag": "0001_cute_hellcat",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781141629564,
+      "tag": "0002_fearless_nico_minoru",
+      "breakpoints": true
     }
   ]
 }
