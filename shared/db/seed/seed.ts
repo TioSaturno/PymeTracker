@@ -45,7 +45,6 @@ async function main() {
     const [usuario] = await db
       .insert(schema.usuarios)
       .values({
-        empresaId: empresa.id,
         nombre: "Marcos Admin",
         email: "marcoscarreno78@gmail.com",
         passwordHash: passwordHash,
@@ -53,7 +52,15 @@ async function main() {
       })
       .returning();
 
-    // 5. Insertar Tienda (Sucursal de la empresa)
+    // 5. Linkear usuario con empresa via tabla puente
+    console.log("🔗 Vinculando usuario con empresa...");
+    await db.insert(schema.usuarioEmpresas).values({
+      usuarioId: usuario.id,
+      empresaId: empresa.id,
+      rol: "admin",
+    });
+
+    // 6. Insertar Tienda (Sucursal de la empresa)
     console.log("🏪 Insertando tienda...");
     const [tienda] = await db
       .insert(schema.tiendas)
@@ -65,7 +72,7 @@ async function main() {
       })
       .returning();
 
-    // 6. Insertar Analisis con la data de executed.json
+    // 7. Insertar Analisis con la data de executed.json
     // Este registro vincula la tienda con el reporte de la competencia
     console.log("📊 Insertando análisis de competencia...");
     await db.insert(schema.analisis).values({

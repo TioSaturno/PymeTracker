@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUsuarioFromRequest } from "./lib/auth";
 
-const publicPaths = ["/auth", "/api"];
+const publicPaths = ["/auth", "/plan", "/api"];
 const adminPaths = ["/admin"];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  console.log(pathname);
 
   const isPublicPath = publicPaths.some(
     (path) => pathname === path || pathname.startsWith(path + "/"),
@@ -15,11 +14,16 @@ export async function middleware(request: NextRequest) {
   if (isPublicPath) {
     const usuario = await getUsuarioFromRequest(request);
 
-    if (
-      usuario &&
-      (pathname === "/auth/login" || pathname === "/auth/registro")
-    ) {
-      return NextResponse.redirect(new URL("/", request.url));
+    if (usuario) {
+      if (
+        pathname === "/auth/login" || pathname === "/auth/registro"
+      ) {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+
+      if (pathname === "/plan" && usuario.planActivo === true) {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
     }
 
     return NextResponse.next();
@@ -37,6 +41,10 @@ export async function middleware(request: NextRequest) {
 
   if (isAdminPath && usuario.rol !== "admin") {
     return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (usuario.planActivo !== true) {
+    return NextResponse.redirect(new URL("/plan", request.url));
   }
 
   return NextResponse.next();

@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1778989126048,
-      "tag": "0000_cool_power_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1780551826698,
-      "tag": "0001_futuristic_martin_li",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1780622690956,
-      "tag": "0002_damp_overlord",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1781038717552,
-      "tag": "0003_woozy_nextwave",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1781156115881,
-      "tag": "0004_small_baron_strucker",
+      "when": 1781192949761,
+      "tag": "0000_nappy_wasp",
       "breakpoints": true
     }
   ]

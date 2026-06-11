@@ -54,10 +54,12 @@ export async function POST(request: NextRequest) {
     const secret = new TextEncoder().encode(JWT_SECRET);
     const token = await new SignJWT({
       id: nuevoUsuario.id,
+      nombre: nuevoUsuario.nombre,
       email: nuevoUsuario.email,
       rol: nuevoUsuario.rol,
       empresaActivaId,
       tiendaActivaId,
+      planActivo: false,
     })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")
@@ -65,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     const response = NextResponse.json({
       data: {
-        usuario: { id: nuevoUsuario.id, nombre: nuevoUsuario.nombre, email: nuevoUsuario.email, rol: nuevoUsuario.rol, empresaActivaId, tiendaActivaId },
+        usuario: { id: nuevoUsuario.id, nombre: nuevoUsuario.nombre, email: nuevoUsuario.email, rol: nuevoUsuario.rol, empresaActivaId, tiendaActivaId, planActivo: false },
       },
     }, { status: 201 });
 

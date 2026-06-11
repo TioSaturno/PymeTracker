@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/auth";
+import { getUsuarioFromRequest } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
-  const usuario = await requireAuth(request);
-  if (usuario instanceof NextResponse) return usuario;
+  const usuario = await getUsuarioFromRequest(request);
+
+  if (!usuario) {
+    return NextResponse.json({ data: null });
+  }
 
   return NextResponse.json({
     data: {
       id: usuario.id,
+      nombre: usuario.nombre || null,
       email: usuario.email,
       rol: usuario.rol,
       empresaActivaId: usuario.empresaActivaId,

@@ -1,7 +1,20 @@
 "use client";
 import {
-  LayoutGrid, LayoutDashboard, ChartNoAxesCombined,
-  Users, History, User, LogOut, ChevronDown, MapPin, Plus, Check, LifeBuoy, Shield,
+  LayoutGrid,
+  LayoutDashboard,
+  ChartNoAxesCombined,
+  Users,
+  History,
+  User,
+  Package,
+  LogOut,
+  ChevronDown,
+  MapPin,
+  Plus,
+  Check,
+  LifeBuoy,
+  CreditCard,
+  Shield,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -12,9 +25,11 @@ const navItems = [
   { href: "/perfil/edit", label: "Mi Perfil", icon: User },
   { href: "/dashboard", label: "Resumen", icon: LayoutDashboard },
   { href: "/analisis/historial", label: "Historial", icon: History },
+  { href: "/inventario", label: "Inventario", icon: Package },
   { href: "/competencia", label: "Competencia", icon: Users },
   { href: "/analisis", label: "Gráficas", icon: ChartNoAxesCombined },
   { href: "/tickets", label: "Soporte", icon: LifeBuoy },
+  { href: "/cuenta", label: "Mi Cuenta", icon: CreditCard },
 ];
 
 const adminNavItems = [

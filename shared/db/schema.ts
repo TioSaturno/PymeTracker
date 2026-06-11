@@ -35,6 +35,7 @@ export const usuarios = pgTable("usuarios", {
   email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
   rol: varchar("rol", { length: 50 }).default("admin"),
+  flowCustomerId: varchar("flow_customer_id", { length: 255 }),
   resetToken: varchar("reset_token", { length: 255 }),
   resetTokenExpires: timestamp("reset_token_expires"),
   fechaCreacion: timestamp("fecha_creacion").defaultNow(),
@@ -70,6 +71,26 @@ export const tiendas = pgTable("tiendas", {
   nombre: varchar("nombre", { length: 255 }).notNull(),
   direccion: text("direccion"),
   fechaCreacion: timestamp("fecha_creacion").defaultNow(),
+});
+
+// ─────────────────────────────────────────────
+// 6. SUSCRIPCIONES (Planes de suscripción)
+// ─────────────────────────────────────────────
+export const suscripciones = pgTable("suscripciones", {
+  id: serial("id").primaryKey(),
+  usuarioId: integer("usuario_id")
+    .references(() => usuarios.id, { onDelete: "cascade" })
+    .notNull(),
+  plan: varchar("plan", { length: 50 }).default("premium").notNull(),
+  precio: integer("precio").notNull(),
+  moneda: varchar("moneda", { length: 10 }).default("CLP").notNull(),
+  estado: varchar("estado", { length: 20 }).default("activa").notNull(),
+  fechaInicio: timestamp("fecha_inicio").defaultNow().notNull(),
+  fechaFin: timestamp("fecha_fin").notNull(),
+  fechaCancelacion: timestamp("fecha_cancelacion"),
+  metodoPago: varchar("metodo_pago", { length: 50 }),
+  referenciaPago: varchar("referencia_pago", { length: 255 }),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // ─────────────────────────────────────────────
@@ -153,6 +174,8 @@ export const usuarioEmpresasRelations = relations(usuarioEmpresas, ({ one }) => 
 export const usuariosRelations = relations(usuarios, ({ many }) => ({
   usuarioEmpresas: many(usuarioEmpresas),
   analisis: many(analisis),
+  suscripciones: many(suscripciones),
+  tickets: many(tickets),
 }));
 
 export const ciudadesRelations = relations(ciudades, ({ many }) => ({
@@ -179,6 +202,13 @@ export const analisisRelations = relations(analisis, ({ one }) => ({
   }),
   usuario: one(usuarios, {
     fields: [analisis.usuarioId],
+    references: [usuarios.id],
+  }),
+}));
+
+export const suscripcionesRelations = relations(suscripciones, ({ one }) => ({
+  usuario: one(usuarios, {
+    fields: [suscripciones.usuarioId],
     references: [usuarios.id],
   }),
 }));
@@ -218,6 +248,9 @@ export type NuevaTienda = typeof tiendas.$inferInsert;
 
 export type Analisis = typeof analisis.$inferSelect;
 export type NuevoAnalisis = typeof analisis.$inferInsert;
+
+export type Suscripcion = typeof suscripciones.$inferSelect;
+export type NuevaSuscripcion = typeof suscripciones.$inferInsert;
 
 export type Inventario = typeof inventarios.$inferSelect;
 export type NuevoInventario = typeof inventarios.$inferInsert;
