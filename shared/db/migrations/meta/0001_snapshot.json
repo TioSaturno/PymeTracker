@@ -1,6 +1,6 @@
 {
-  "id": "395c1fd0-bfad-4452-9b00-cf3eeee46a6d",
-  "prevId": "5db87286-09bf-44f9-8589-cae5af3f11be",
+  "id": "e0538f05-c4fe-4806-9b98-5ce9ac0b94f3",
+  "prevId": "8717386e-a841-42d3-a156-e79b62cc2e1d",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -268,6 +268,110 @@
           "tableTo": "tiendas",
           "columnsFrom": [
             "tienda_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.suscripciones": {
+      "name": "suscripciones",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "plan": {
+          "name": "plan",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'premium'"
+        },
+        "precio": {
+          "name": "precio",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "moneda": {
+          "name": "moneda",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'CLP'"
+        },
+        "estado": {
+          "name": "estado",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'activa'"
+        },
+        "fecha_inicio": {
+          "name": "fecha_inicio",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "fecha_fin": {
+          "name": "fecha_fin",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fecha_cancelacion": {
+          "name": "fecha_cancelacion",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metodo_pago": {
+          "name": "metodo_pago",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "referencia_pago": {
+          "name": "referencia_pago",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "suscripciones_usuario_id_usuarios_id_fk": {
+          "name": "suscripciones_usuario_id_usuarios_id_fk",
+          "tableFrom": "suscripciones",
+          "tableTo": "usuarios",
+          "columnsFrom": [
+            "usuario_id"
           ],
           "columnsTo": [
             "id"
@@ -563,6 +667,12 @@
           "primaryKey": false,
           "notNull": false,
           "default": "'admin'"
+        },
+        "flow_customer_id": {
+          "name": "flow_customer_id",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
         },
         "reset_token": {
           "name": "reset_token",
