@@ -4,6 +4,7 @@ import { usuarios, tiendas, usuarioEmpresas } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { SignJWT } from "jose";
+import { tieneAccesoValido } from "@/lib/auth";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev-secret-change-in-production";
 
@@ -27,6 +28,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Credenciales inválidas" }, { status: 401 });
     }
 
+    const planActivo = await tieneAccesoValido(usuario.id);
+
     // Buscar empresas del usuario y tomar la primera como activa
     const misEmpresas = await db
       .select({ empresaId: usuarioEmpresas.empresaId })
@@ -49,10 +52,12 @@ export async function POST(request: NextRequest) {
     const secret = new TextEncoder().encode(JWT_SECRET);
     const token = await new SignJWT({
       id: usuario.id,
+      nombre: usuario.nombre,
       email: usuario.email,
       rol: usuario.rol,
       empresaActivaId,
       tiendaActivaId,
+      planActivo,
     })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")
@@ -67,6 +72,7 @@ export async function POST(request: NextRequest) {
           rol: usuario.rol,
           empresaActivaId,
           tiendaActivaId,
+          planActivo,
         },
       },
     });
