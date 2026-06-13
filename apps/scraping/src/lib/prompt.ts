@@ -91,7 +91,10 @@ Retorna ÚNICAMENTE un JSON válido (sin markdown, sin backticks, sin texto adic
       ],
       "sitio_web": "https://ejemplo.cl",
       "google_maps_url": "https://maps.google.com/...",
-      "ubicacion": "Calle Ejemplo 123, Ciudad"
+      "ubicacion": "Calle Ejemplo 123, Ciudad",
+      "fortalezas": ["Buena atención", "Precios accesibles"],
+      "debilidades": ["Poco estacionamiento"],
+      "resumen_opiniones": "Los clientes destacan la rapidez y buenos precios, pero mencionan la falta de espacio para estacionar."
     }
   ],
   "busqueda": {
@@ -120,6 +123,9 @@ Reglas:
 - "sitio_web": URL del sitio web o null si no tiene.
 - "google_maps_url": URL de Google Maps del negocio.
 - "ubicacion": dirección formateada del negocio.
+- "fortalezas": Array de strings cortos (1-4 palabras máximo cada uno) con los puntos más elogiados de ESTE negocio en particular según sus reseñas.
+- "debilidades": Array de strings cortos (1-4 palabras máximo cada uno) con las críticas o puntos de mejora de ESTE negocio en particular según sus reseñas. Si no hay, array vacío.
+- "resumen_opiniones": Un párrafo corto (máximo 2 oraciones) resumiendo la opinión general de los clientes sobre ESTE negocio.
 - "busqueda": refleja el tema y ubicación de la búsqueda original.
 - "fecha": fecha actual en formato YYYY-MM-DD.
 - "total_empresas": cantidad total de empresas en el array.

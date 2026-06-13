@@ -18,6 +18,9 @@ export interface Empresa {
     precio: number;
     imagen_url: string | null;
   }> | null;
+  fortalezas?: string[];
+  debilidades?: string[];
+  resumen_opiniones?: string;
   _meta?: {
     analisisId: number;
     status: string;
@@ -196,6 +199,17 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
           )}
 
           <div className="p-5">
+            {empresa.resumen_opiniones && (
+              <div className="mb-6 bg-[#fedcd0]/20 border border-[#fedcd0] rounded-xl p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#725950] mb-2 flex items-center gap-2">
+                  <span>✨</span> RESUMEN DE OPINIONES
+                </p>
+                <p className="text-sm text-[#4f4441] leading-relaxed m-0 italic">
+                  "{empresa.resumen_opiniones}"
+                </p>
+              </div>
+            )}
+
             <p className="text-xs font-semibold uppercase tracking-wider text-[#817470] mb-3">
               ÚLTIMAS OPINIONES ({calificaciones.ultimas_resenas.length})
             </p>
