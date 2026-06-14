@@ -31,10 +31,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Debes completar el rubro de tu empresa antes de ejecutar un análisis" }, { status: 400 });
     }
 
-    if (!empresa.direccion && !empresa.comuna) {
-      return NextResponse.json({ error: "Debes completar la dirección o comuna de tu empresa antes de ejecutar un análisis" }, { status: 400 });
-    }
-
     if (!usuario.tiendaActivaId) {
       return NextResponse.json({ error: "No hay una tienda/sucursal activa para ejecutar el análisis" }, { status: 400 });
     }
@@ -47,6 +43,10 @@ export async function POST(request: NextRequest) {
 
     if (!tienda) {
       return NextResponse.json({ error: "Tienda/sucursal activa no encontrada" }, { status: 404 });
+    }
+
+    if (!tienda.direccion && !empresa.direccion && !empresa.comuna) {
+      return NextResponse.json({ error: "Debes completar la dirección de la sucursal o de tu empresa antes de ejecutar un análisis" }, { status: 400 });
     }
 
     const [nuevoAnalisis] = await db
@@ -66,7 +66,8 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         analisisId: nuevoAnalisis.id,
         topic: empresa.rubro,
-        location: empresa.comuna || empresa.direccion || "",
+        location: tienda.direccion || empresa.comuna || empresa.direccion || "",
+        tiendaBase: tienda.nombre,
         nResults,
       }),
     }).catch((err) => {
