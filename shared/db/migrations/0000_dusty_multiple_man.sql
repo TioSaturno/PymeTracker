@@ -52,6 +52,18 @@ CREATE TABLE "suscripciones" (
 	"created_at" timestamp DEFAULT now()
 );
 --> statement-breakpoint
+CREATE TABLE "tickets" (
+	"id" serial PRIMARY KEY NOT NULL,
+	"usuario_id" integer,
+	"empresa_id" integer,
+	"asunto" varchar(255) NOT NULL,
+	"descripcion" text NOT NULL,
+	"status" varchar(20) DEFAULT 'abierto',
+	"prioridad" varchar(20) DEFAULT 'media',
+	"fecha_creacion" timestamp DEFAULT now(),
+	"fecha_actualizacion" timestamp DEFAULT now()
+);
+--> statement-breakpoint
 CREATE TABLE "tiendas" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"empresa_id" integer,
@@ -86,6 +98,8 @@ ALTER TABLE "analisis" ADD CONSTRAINT "analisis_tienda_id_tiendas_id_fk" FOREIGN
 ALTER TABLE "analisis" ADD CONSTRAINT "analisis_usuario_id_usuarios_id_fk" FOREIGN KEY ("usuario_id") REFERENCES "public"."usuarios"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "inventarios" ADD CONSTRAINT "inventarios_tienda_id_tiendas_id_fk" FOREIGN KEY ("tienda_id") REFERENCES "public"."tiendas"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "suscripciones" ADD CONSTRAINT "suscripciones_usuario_id_usuarios_id_fk" FOREIGN KEY ("usuario_id") REFERENCES "public"."usuarios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "tickets" ADD CONSTRAINT "tickets_usuario_id_usuarios_id_fk" FOREIGN KEY ("usuario_id") REFERENCES "public"."usuarios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "tickets" ADD CONSTRAINT "tickets_empresa_id_empresas_id_fk" FOREIGN KEY ("empresa_id") REFERENCES "public"."empresas"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tiendas" ADD CONSTRAINT "tiendas_empresa_id_empresas_id_fk" FOREIGN KEY ("empresa_id") REFERENCES "public"."empresas"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "tiendas" ADD CONSTRAINT "tiendas_ciudad_id_ciudades_id_fk" FOREIGN KEY ("ciudad_id") REFERENCES "public"."ciudades"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "usuario_empresas" ADD CONSTRAINT "usuario_empresas_usuario_id_usuarios_id_fk" FOREIGN KEY ("usuario_id") REFERENCES "public"."usuarios"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
