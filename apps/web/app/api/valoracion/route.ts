@@ -86,30 +86,38 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    if (!usuario.tiendaActivaId) {
+      return NextResponse.json(
+        { error: "No tienes una tienda/sucursal activa" },
+        { status: 400 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const competidorNombre = searchParams.get("competidorNombre");
     
-    const [empresaData, primerasTiendas] = await Promise.all([
+    const [empresaData, tienda] = await Promise.all([
       db
         .select({ nombre: empresas.nombre })
         .from(empresas)
         .where(eq(empresas.id, usuario.empresaActivaId))
         .limit(1),
       db
-        .select({ id: tiendas.id })
+        .select({ id: tiendas.id, empresaId: tiendas.empresaId })
         .from(tiendas)
-        .where(eq(tiendas.empresaId, usuario.empresaActivaId))
+        .where(eq(tiendas.id, usuario.tiendaActivaId))
         .limit(1),
     ]);
     const empresa = empresaData[0];
-    const tienda = primerasTiendas[0];
-    if (!empresa || !tienda) {
+    const tiendaRow = tienda[0];
+    if (!empresa || !tiendaRow) {
       return NextResponse.json(
         { error: "No se encontró empresa o tienda asociada" },
         { status: 400 }
       );
     }
-   
+    
     const [latest] = await db
       .select({
         id: analisis.id,
@@ -119,7 +127,7 @@ export async function GET(request: NextRequest) {
       .from(analisis)
       .where(
         and(
-          eq(analisis.tiendaId, tienda.id),
+          eq(analisis.tiendaId, usuario.tiendaActivaId),
           eq(analisis.usuarioId, usuario.id),
           eq(analisis.status, "completed")
         )
