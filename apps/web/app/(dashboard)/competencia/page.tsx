@@ -118,10 +118,7 @@ export default function Competencia() {
 
         if (perfilRes.ok) {
           const perfilJson = await perfilRes.json();
-          const tiendas = perfilJson.data?.tiendas;
-          if (tiendas && tiendas.length > 0) {
-            tiendaId = tiendas[0].id;
-          }
+          tiendaId = perfilJson.data?.tiendaActivaId ?? null;
         }
 
         if (!tiendaId) {

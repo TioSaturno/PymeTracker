@@ -9,47 +9,30 @@ export async function GET(request: NextRequest) {
     const usuario = await requireAuth(request);
     if (usuario instanceof NextResponse) return usuario;
 
-    const { searchParams } = new URL(request.url);
-    let tiendaId: number | null = searchParams.get("tiendaId")
-      ? Number(searchParams.get("tiendaId"))
-      : null;
-    let nombreEmpresaActiva: string | null = null;
-
-    // Si no viene por query, usar tiendaActivaId del JWT
-    if (!tiendaId && usuario.tiendaActivaId) {
-      tiendaId = usuario.tiendaActivaId;
+    if (!usuario.tiendaActivaId) {
+      return NextResponse.json({ error: "No tienes una tienda/sucursal activa" }, { status: 400 });
     }
 
-    // Si aún no hay, derivar desde empresaActivaId
-    if (!tiendaId && usuario.empresaActivaId) {
-      const [empresasData, tiendasData] = await Promise.all([
-        db
-          .select({ nombre: empresas.nombre })
-          .from(empresas)
-          .where(eq(empresas.id, usuario.empresaActivaId))
-          .limit(1),
-        db
-          .select({ id: tiendas.id })
-          .from(tiendas)
-          .where(eq(tiendas.empresaId, usuario.empresaActivaId))
-          .limit(1),
-      ]);
+    // Validar que la tienda activa existe y obtener empresa
+    const [tienda] = await db
+      .select({ id: tiendas.id, empresaId: tiendas.empresaId })
+      .from(tiendas)
+      .where(eq(tiendas.id, usuario.tiendaActivaId))
+      .limit(1);
 
-      const firstTienda = tiendasData[0];
-      nombreEmpresaActiva = empresasData[0]?.nombre ?? null;
-      if (firstTienda) tiendaId = firstTienda.id;
-    } else if (usuario.empresaActivaId) {
-      const [empresaData] = await db
-        .select({ nombre: empresas.nombre })
-        .from(empresas)
-        .where(eq(empresas.id, usuario.empresaActivaId))
-        .limit(1);
-      nombreEmpresaActiva = empresaData?.nombre ?? null;
+    if (!tienda || !tienda.empresaId) {
+      return NextResponse.json({ error: "La tienda activa no existe" }, { status: 400 });
     }
 
-    if (!tiendaId) {
-      return NextResponse.json({ error: "No se encontró una tienda asociada" }, { status: 400 });
-    }
+    // Obtener nombre de la empresa para filtrar "mi negocio" vs competidores
+    const [empresa] = await db
+      .select({ nombre: empresas.nombre })
+      .from(empresas)
+      .where(eq(empresas.id, tienda.empresaId))
+      .limit(1);
+    const nombreEmpresaActiva = empresa?.nombre ?? null;
+
+    // Último análisis completado para esta tienda
     const [latest] = await db
       .select({
         id: analisis.id,
@@ -60,7 +43,7 @@ export async function GET(request: NextRequest) {
       .from(analisis)
       .where(
         and(
-          eq(analisis.tiendaId, tiendaId),
+          eq(analisis.tiendaId, usuario.tiendaActivaId),
           eq(analisis.usuarioId, usuario.id),
           eq(analisis.status, "completed"),
         ),
