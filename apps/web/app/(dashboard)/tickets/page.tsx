@@ -11,6 +11,7 @@ type Ticket = {
   descripcion: string;
   status: string;
   prioridad: string;
+  respuesta: string | null;
   fechaCreacion: string;
   usuarioId: number;
 };
@@ -32,24 +33,14 @@ export default function TicketsPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandido, setExpandido] = useState<number | null>(null);
-  const [esAdmin, setEsAdmin] = useState(false);
 
   useEffect(() => {
     async function cargar() {
       try {
-        const [ticketsRes, meRes] = await Promise.all([
-          fetch("/api/tickets"),
-          fetch("/api/auth/me"),
-        ]);
-
+        const ticketsRes = await fetch("/api/tickets");
         if (ticketsRes.ok) {
           const { data } = await ticketsRes.json();
           setTickets(data);
-        }
-
-        if (meRes.ok) {
-          const { data } = await meRes.json();
-          setEsAdmin(data?.rol === "admin");
         }
       } catch (e) {
         console.error(e);
@@ -59,23 +50,6 @@ export default function TicketsPage() {
     }
     cargar();
   }, []);
-
-  const handleStatusChange = async (id: number, status: string) => {
-    try {
-      const res = await fetch(`/api/tickets/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      if (res.ok) {
-        setTickets((prev) =>
-          prev.map((t) => (t.id === id ? { ...t, status } : t))
-        );
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
 
   return (
     <div style={{ fontFamily: "'Inter', sans-serif" }}>
@@ -134,25 +108,17 @@ export default function TicketsPage() {
                 </button>
 
                 {expandido === ticket.id && (
-                  <div className="px-6 pb-5 border-t border-[#e4e2e2]">
+                  <div className="px-6 pb-5 border-t border-[#e4e2e2] space-y-4">
                     <p className="text-sm text-[#4f4441] mt-4 leading-relaxed">{ticket.descripcion}</p>
 
-                    {esAdmin && (
-                      <div className="mt-4 flex items-center gap-2">
-                        <span className="text-xs text-[#817470]">Cambiar estado:</span>
-                        {["abierto", "en_progreso", "resuelto"].map((s) => (
-                          <button
-                            key={s}
-                            onClick={() => handleStatusChange(ticket.id, s)}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                              ticket.status === s
-                                ? "bg-[#725950] text-white"
-                                : "bg-[#f5f3f3] text-[#4f4441] hover:bg-[#fedcd0]"
-                            }`}
-                          >
-                            {s.replace("_", " ")}
-                          </button>
-                        ))}
+                    {ticket.respuesta && (
+                      <div className="bg-[#dbe3f1]/20 border border-[#dbe3f1] rounded-xl p-4">
+                        <p className="text-xs font-semibold uppercase tracking-wider text-[#575f6b] mb-1">
+                          RESPUESTA DEL EQUIPO
+                        </p>
+                        <p className="text-sm text-[#1b1c1c] leading-relaxed">
+                          {ticket.respuesta}
+                        </p>
                       </div>
                     )}
                   </div>

@@ -15,6 +15,7 @@ import {
   LifeBuoy,
   CreditCard,
   Shield,
+  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -28,12 +29,7 @@ const navItems = [
   { href: "/inventario", label: "Inventario", icon: Package },
   { href: "/competencia", label: "Competencia", icon: Users },
   { href: "/analisis", label: "Gráficas", icon: ChartNoAxesCombined },
-  { href: "/tickets", label: "Soporte", icon: LifeBuoy },
   { href: "/cuenta", label: "Mi Cuenta", icon: CreditCard },
-];
-
-const adminNavItems = [
-  { href: "/admin/ejecuciones", label: "Ejecuciones", icon: Shield },
 ];
 
 interface SidebarProps {
@@ -53,7 +49,6 @@ export default function Sidebar({ rol }: SidebarProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isAdmin = rol === "admin";
-  const allNavItems = isAdmin ? [...navItems, ...adminNavItems] : navItems;
 
   useEffect(() => {
     async function cargarSucursales() {
@@ -96,7 +91,7 @@ export default function Sidebar({ rol }: SidebarProps) {
       if (res.ok) {
         setActiva(tienda);
         setOpen(false);
-        router.refresh();
+        window.location.reload();
       }
     } catch (e) {
       console.error("Error al cambiar sucursal:", e);
@@ -193,7 +188,7 @@ export default function Sidebar({ rol }: SidebarProps) {
 
       {/* Nav */}
       <nav className="flex-1 space-y-2">
-        {allNavItems.map((item) => {
+        {navItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
           return (
@@ -214,8 +209,22 @@ export default function Sidebar({ rol }: SidebarProps) {
         })}
       </nav>
 
+      {/* Admin panel button */}
+      {isAdmin && (
+        <div className="mb-3">
+          <Link
+            href="/admin"
+            className="flex items-center gap-x-3 rounded-xl px-3 py-2.5 bg-[#725950] text-white hover:bg-[#5d4a42] transition-all duration-200 shadow-sm"
+            style={{ fontFamily: "'Inter', sans-serif" }}
+          >
+            <ShieldCheck className="h-5 w-5" />
+            <span className="text-sm font-medium">Panel Admin</span>
+          </Link>
+        </div>
+      )}
+
       {/* Logout */}
-      <div className="mt-auto pt-4 border-t border-[#e4e2e2]">
+      <div className="pt-4 border-t border-[#e4e2e2]">
         <button
           onClick={handleLogout}
           disabled={loading}

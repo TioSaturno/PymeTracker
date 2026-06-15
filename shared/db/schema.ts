@@ -147,6 +147,9 @@ export const tickets = pgTable("tickets", {
   descripcion: text("descripcion").notNull(),
   status: varchar("status", { length: 20 }).default("abierto"),
   prioridad: varchar("prioridad", { length: 20 }).default("media"),
+  respuesta: text("respuesta"),
+  respondidoPor: integer("respondido_por").references(() => usuarios.id),
+  fechaRespuesta: timestamp("fecha_respuesta"),
   fechaCreacion: timestamp("fecha_creacion").defaultNow(),
   fechaActualizacion: timestamp("fecha_actualizacion").defaultNow().$onUpdate(() => new Date()),
 });

@@ -42,11 +42,10 @@ export async function GET(request: NextRequest) {
     const usuario = await requireAuth(request);
     if (usuario instanceof NextResponse) return usuario;
 
-    // Admin ve todos, usuario ve solo los suyos
     const result = await db
       .select()
       .from(tickets)
-      .where(usuario.rol === "admin" ? undefined : eq(tickets.usuarioId, usuario.id))
+      .where(eq(tickets.usuarioId, usuario.id))
       .orderBy(desc(tickets.fechaCreacion));
 
     return NextResponse.json({ data: result });
