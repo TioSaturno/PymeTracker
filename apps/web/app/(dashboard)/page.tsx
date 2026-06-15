@@ -12,6 +12,9 @@ type NegocioResumen = {
   total_resenas: number;
   rango_precio_gmaps: string;
   ubicacion: string;
+  fortalezas?: string[];
+  debilidades?: string[];
+  resumen_opiniones?: string;
 };
 
 
@@ -373,14 +376,22 @@ export default function DashboardPage() {
             <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] border-t-white/50 border-l-white/50 p-6 mb-8 flex flex-col md:flex-row gap-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
 
               
-              {datos.mi_negocio && (
+              {datos.mi_negocio ? (
                 <PanelNegocio
                   titulo="Mi Negocio"
                   negocio={datos.mi_negocio}
-                  fortalezas={datos.fortalezas_rubro}
-                  debilidades={datos.debilidades_rubro}
+                  fortalezas={datos.mi_negocio.fortalezas && datos.mi_negocio.fortalezas.length > 0 ? datos.mi_negocio.fortalezas : datos.fortalezas_rubro}
+                  debilidades={datos.mi_negocio.debilidades && datos.mi_negocio.debilidades.length > 0 ? datos.mi_negocio.debilidades : datos.debilidades_rubro}
                   esPropio={true}
                 />
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center bg-[#f5f3f3]/50 rounded-2xl border border-dashed border-[#d3c3be] p-6 text-center">
+                  <p className="text-3xl mb-3">🏢</p>
+                  <p className="text-sm font-semibold text-[#1b1c1c] mb-1">Tu negocio no está asociado en Google Maps</p>
+                  <p className="text-xs text-[#817470] max-w-[250px]">
+                    No encontramos tu negocio en Google Maps durante el análisis, por lo que no podemos mostrar tus reseñas, ranking, ni fortalezas.
+                  </p>
+                </div>
               )}
 
               <div className="hidden md:block w-px bg-[#e4e2e2]" />
@@ -390,8 +401,8 @@ export default function DashboardPage() {
                 <PanelNegocio
                   titulo="Competencia"
                   negocio={datos.competidor}
-                  fortalezas={datos.fortalezas_rubro}
-                  debilidades={datos.debilidades_rubro}
+                  fortalezas={datos.competidor.fortalezas && datos.competidor.fortalezas.length > 0 ? datos.competidor.fortalezas : datos.fortalezas_rubro}
+                  debilidades={datos.competidor.debilidades && datos.competidor.debilidades.length > 0 ? datos.competidor.debilidades : datos.debilidades_rubro}
                   esPropio={false}
                 />
               ) : (

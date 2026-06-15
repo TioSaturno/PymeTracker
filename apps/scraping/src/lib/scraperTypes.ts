@@ -34,6 +34,9 @@ export interface EmpresaOutput {
   sitio_web: string | null;
   google_maps_url: string | null;
   ubicacion: string;
+  fortalezas: string[];
+  debilidades: string[];
+  resumen_opiniones: string;
 }
 
 // ── Análisis comparativo cuando se proporciona tienda_base ──

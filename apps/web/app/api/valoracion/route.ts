@@ -27,6 +27,9 @@ type EmpresaPayload = {
   sitio_web: string | null;
   ubicacion: string;
   google_maps_url: string;
+  fortalezas?: string[];
+  debilidades?: string[];
+  resumen_opiniones?: string;
 };
 
 type PayloadData = {
@@ -180,6 +183,9 @@ export async function GET(request: NextRequest) {
           total_resenas: miNegocio.calificaciones.total_resenas,
           rango_precio_gmaps: miNegocio.calificaciones.rango_precio_gmaps,
           ubicacion: miNegocio.ubicacion,
+          fortalezas: miNegocio.fortalezas ?? [],
+          debilidades: miNegocio.debilidades ?? [],
+          resumen_opiniones: miNegocio.resumen_opiniones ?? "",
         }
       : null;
     
@@ -216,6 +222,9 @@ export async function GET(request: NextRequest) {
       sitio_web: competidorElegido.sitio_web,
       ubicacion: competidorElegido.ubicacion,
       google_maps_url: competidorElegido.google_maps_url,
+      fortalezas: competidorElegido.fortalezas ?? [],
+      debilidades: competidorElegido.debilidades ?? [],
+      resumen_opiniones: competidorElegido.resumen_opiniones ?? "",
     };
     return NextResponse.json({
       fecha_analisis: latest.fechaEjecucion,
