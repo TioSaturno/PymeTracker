@@ -109,6 +109,7 @@ export default function Competencia() {
   const [sortBy, setSortBy] = useState<"opiniones" | "valoracion">(
     "valoracion",
   );
+  const [resumenesCache, setResumenesCache] = useState<Record<string, string>>({});
 
   useEffect(() => {
     const fetchCompetencia = async () => {
@@ -291,7 +292,14 @@ export default function Competencia() {
           )}
         </div>
       </main>
-      <ModalEmpresa empresa={selected} onClose={() => setSelected(null)} />
+      <ModalEmpresa
+        empresa={selected}
+        onClose={() => setSelected(null)}
+        resumenesCache={resumenesCache}
+        onCacheResumen={(nombre, resumen) =>
+          setResumenesCache((prev) => ({ ...prev, [nombre]: resumen }))
+        }
+      />
     </>
   );
 }

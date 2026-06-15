@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export interface Empresa {
   nombre: string;
@@ -33,6 +33,8 @@ export interface Empresa {
 interface Props {
   empresa: Empresa | null;
   onClose: () => void;
+  resumenesCache: Record<string, string>;
+  onCacheResumen: (nombre: string, resumen: string) => void;
 }
 
 function StarRating({ rating }: { rating: number }) {
@@ -66,7 +68,15 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-export default function ModalEmpresa({ empresa, onClose }: Props) {
+export default function ModalEmpresa({
+  empresa,
+  onClose,
+  resumenesCache,
+  onCacheResumen,
+}: Props) {
+  const [resumenGenerado, setResumenGenerado] = useState<string | null>(null);
+  const [resumenLoading, setResumenLoading] = useState(false);
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -74,6 +84,43 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, [onClose]);
+
+  useEffect(() => {
+    if (!empresa) {
+      setResumenGenerado(null);
+      setResumenLoading(false);
+      return;
+    }
+    const ultimasResenas = empresa.calificaciones.ultimas_resenas;
+    if (!ultimasResenas || ultimasResenas.length === 0) return;
+
+    const nombre = empresa.nombre;
+    if (resumenesCache[nombre]) {
+      setResumenGenerado(resumenesCache[nombre]);
+      setResumenLoading(false);
+      return;
+    }
+
+    setResumenLoading(true);
+    setResumenGenerado(null);
+
+    fetch("/api/resumen-opiniones", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ resenas: ultimasResenas }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.resumen) {
+          onCacheResumen(nombre, data.resumen);
+          setResumenGenerado(data.resumen);
+        }
+      })
+      .catch((err) => {
+        console.error("Error generando resumen:", err);
+      })
+      .finally(() => setResumenLoading(false));
+  }, [empresa, resumenesCache, onCacheResumen]);
 
   useEffect(() => {
     if (empresa) {
@@ -199,13 +246,23 @@ export default function ModalEmpresa({ empresa, onClose }: Props) {
           )}
 
           <div className="p-5">
-            {empresa.resumen_opiniones && (
+            {resumenLoading && (
+              <div className="mb-6 bg-[#fedcd0]/20 border border-[#fedcd0] rounded-xl p-4">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[#725950] mb-2 flex items-center gap-2">
+                  <span>✨</span> RESUMEN DE OPINIONES
+                </p>
+                <p className="text-sm text-[#4f4441] leading-relaxed m-0">
+                  Generando resumen de reseñas...
+                </p>
+              </div>
+            )}
+            {resumenGenerado && (
               <div className="mb-6 bg-[#fedcd0]/20 border border-[#fedcd0] rounded-xl p-4">
                 <p className="text-xs font-semibold uppercase tracking-wider text-[#725950] mb-2 flex items-center gap-2">
                   <span>✨</span> RESUMEN DE OPINIONES
                 </p>
                 <p className="text-sm text-[#4f4441] leading-relaxed m-0 italic">
-                  "{empresa.resumen_opiniones}"
+                  "{resumenGenerado}"
                 </p>
               </div>
             )}
