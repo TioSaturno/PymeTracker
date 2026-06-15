@@ -31,8 +31,11 @@ export default function DashboardPage() {
         if (userRes.ok) {
           const userJson = await userRes.json();
           setUserData(userJson.data);
+          const tiendaActivaId = userJson.data?.tiendaActivaId;
           const tiendas = userJson.data?.tiendas;
-          if (tiendas && tiendas.length > 0) {
+          if (tiendaActivaId) {
+            tiendaId = tiendaActivaId;
+          } else if (tiendas && tiendas.length > 0) {
             tiendaId = tiendas[0].id;
           }
         }
