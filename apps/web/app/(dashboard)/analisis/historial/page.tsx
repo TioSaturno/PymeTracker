@@ -81,6 +81,69 @@ export default function HistorialPage() {
     fetchData();
   }, []);
 
+  const exportToCSV = () => {
+    const rows: string[][] = [];
+    const headers = [
+      "ID", "Fecha", "Estado", "Búsqueda", "Ubicación",
+      "Empresa", "Rating", "Reseñas", "Rango Precio", "Sitio Web",
+      "Producto", "Precio Producto",
+      "Mejor Valorado", "Más Criticado",
+    ];
+    rows.push(headers);
+
+    for (const exec of executions) {
+      const fecha = formatDate(exec.fechaEjecucion);
+      const busqueda = exec.payload?.busqueda?.tema ?? "";
+      const ubicacion = exec.payload?.busqueda?.ubicacion ?? "";
+      const masValorado = exec.payload?.mas_valorado ?? "";
+      const masCriticado = exec.payload?.mas_criticado ?? "";
+      const empresas = exec.payload?.empresas ?? [];
+
+      if (empresas.length === 0) {
+        rows.push([String(exec.id), fecha, exec.status, busqueda, ubicacion, "", "", "", "", "", "", "", masValorado, masCriticado]);
+      } else {
+        for (const empresa of empresas) {
+          const precios = empresa.precios ?? [];
+          if (precios.length === 0) {
+            rows.push([
+              String(exec.id), fecha, exec.status, busqueda, ubicacion,
+              empresa.nombre, String(empresa.calificaciones?.rating ?? ""),
+              String(empresa.calificaciones?.total_resenas ?? ""),
+              empresa.calificaciones?.rango_precio_gmaps ?? "",
+              empresa.sitio_web ?? "",
+              "", "",
+              masValorado, masCriticado,
+            ]);
+          } else {
+            for (const precio of precios) {
+              rows.push([
+                String(exec.id), fecha, exec.status, busqueda, ubicacion,
+                empresa.nombre, String(empresa.calificaciones?.rating ?? ""),
+                String(empresa.calificaciones?.total_resenas ?? ""),
+                empresa.calificaciones?.rango_precio_gmaps ?? "",
+                empresa.sitio_web ?? "",
+                precio.producto, String(precio.precio),
+                masValorado, masCriticado,
+              ]);
+            }
+          }
+        }
+      }
+    }
+
+    const csvContent = rows.map((row) =>
+      row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(",")
+    ).join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `historial-analisis-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString("es-CL", {
@@ -108,6 +171,22 @@ export default function HistorialPage() {
 
       <main className="flex-grow flex flex-col items-center p-8 w-full max-w-4xl mx-auto gap-6">
         <EjecutarAnalisis />
+
+        {!loading && executions.length > 0 && (
+          <div className="w-full flex justify-end">
+            <button
+              onClick={exportToCSV}
+              className="px-4 py-2 bg-white/80 border border-[#e4e2e2] rounded-xl text-sm font-semibold text-[#4f4441] hover:bg-[#f5f3f3] transition-all duration-200 shadow-[0_2px_8px_rgb(0,0,0,0.04)] flex items-center gap-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Exportar CSV
+            </button>
+          </div>
+        )}
 
         {loading ? (
           <div className="bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] w-full p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-center font-semibold text-[#4f4441]">
