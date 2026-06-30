@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUsuarioFromRequest } from "./lib/auth";
+import { getUsuarioFromRequest } from "./lib/auth-edge";
 
 const publicPaths = ["/auth", "/plan", "/api"];
 const adminPaths = ["/admin"];
