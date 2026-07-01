@@ -5,7 +5,7 @@
 ### UT-01: Registro – validación de campos obligatorios
 - **Prioridad:** Alta
 - **Pasos:**
-  1. Enviar POST `/api/auth/register` sin body
+  1. Enviar POST `/api/auth/registro` sin body
   2. Verificar respuesta `400` con mensaje de campos requeridos
   3. Enviar POST con email vacío
   4. Verificar respuesta `400`
@@ -15,7 +15,7 @@
 - **Prioridad:** Alta
 - **Pasos:**
   1. Crear usuario con email `test@test.com`
-  2. Enviar POST `/api/auth/register` con el mismo email
+  2. Enviar POST `/api/auth/registro` con el mismo email
   3. Verificar respuesta `409` y que no se crea duplicado
 - **Datos:** `{ nombre: "Test", email: "test@test.com", password: "123456" }`
 
@@ -50,7 +50,7 @@
 - **Prioridad:** Media
 - **Pasos:**
   1. Crear suscripción activa para un usuario
-  2. Enviar POST `/api/suscripciones/cancelar`
+  2. Enviar POST `/api/suscripcion/cancelar`
   3. Verificar que estado cambia a `cancelada` y fecha_cancelacion se setea
 
 ### UT-07: Tickets – envío con campos obligatorios
@@ -68,7 +68,7 @@
 ### IT-01: Registro exitoso – solo usuario
 - **Prioridad:** Alta
 - **Pasos:**
-  1. Enviar POST `/api/auth/register` con datos válidos (solo usuario, sin empresa)
+  1. Enviar POST `/api/auth/registro` con datos válidos (solo usuario, sin empresa)
   2. Verificar respuesta `201` con token JWT
   3. Verificar que el usuario existe en DB
   4. Verificar que no se creó empresa
@@ -77,7 +77,7 @@
 ### IT-02: Registro exitoso – usuario + empresa
 - **Prioridad:** Alta
 - **Pasos:**
-  1. Enviar POST `/api/auth/register` con datos de usuario y empresa
+  1. Enviar POST `/api/auth/registro` con datos de usuario y empresa
   2. Verificar respuesta `201` con token JWT
   3. Verificar que se crearon usuario, empresa y relación usuario_empresas
   4. Verificar que se creó una tienda por defecto
@@ -96,18 +96,17 @@
 - **Prioridad:** Alta
 - **Pasos:**
   1. Autenticarse y obtener token
-  2. GET `/api/empresas` → listar perfiles
-  3. POST `/api/empresas` con body `{ nombre, rubro }` → crear
-  4. PUT `/api/empresas/:id` con `{ nombre: "Nuevo nombre" }` → actualizar
+  2. GET `/api/empresa/perfil` → leer perfil activo
+  3. POST `/api/empresa/perfil` con body `{ nombre, rubro }` → crear nueva empresa
+  4. PUT `/api/empresa/perfil` con `{ nombre: "Nuevo nombre" }` → actualizar empresa activa
   5. Verificar cambios en DB
 
 ### IT-05: Perfiles – cambio de perfil activo
 - **Prioridad:** Media
 - **Pasos:**
   1. Crear dos empresas para el mismo usuario
-  2. POST `/api/empresas/:id/seleccionar` para cambiar perfil activo
-  3. GET `/api/perfil` → verificar que devuelve la empresa activa correcta
-  4. Verificar que no se requiere recargar sesión
+  2. POST `/api/empresa/perfil/switch` con `{ empresaId }` para cambiar perfil activo
+  3. GET `/api/empresa/perfil` → verificar que devuelve la empresa activa correcta
 
 ### IT-06: Análisis – ejecución exitosa
 - **Prioridad:** Alta
@@ -171,40 +170,39 @@
 ### IT-14: Dashboard – datos de métricas
 - **Prioridad:** Media
 - **Pasos:**
-  1. Tener análisis completado con precioPromedio y competidores
-  2. GET `/api/dashboard/metricas`
-  3. Verificar que devuelve `precioPromedioMercado`, `totalCompetidores`, `ultimoAnalisis`
+  1. Tener análisis completado con payloadProcesado y competidores
+  2. GET `/api/analytics`
+  3. Verificar que devuelve `preciosPromedios`, `comparativaProductos`, `composicionOferta`
 
 ### IT-15: Dashboard – historial de análisis
 - **Prioridad:** Media
 - **Pasos:**
   1. Tener varios análisis ejecutados
-  2. GET `/api/dashboard/historial`
+  2. GET `/api/analisis/historial`
   3. Verificar listado ordenado por fecha descendente
 
 ### IT-16: Suscripción – contratación con Flow
 - **Prioridad:** Alta
 - **Pasos:**
   1. Usuario sin suscripción activa
-  2. POST `/api/suscripciones/contratar` con `{ plan: "premium" }`
-  3. Verificar redirección a Flow o respuesta con URL de pago
-  4. Simular webhook de Flow con pago exitoso
-  5. Verificar que suscripción queda `activa` con fecha_fin correcta
+  2. POST `/api/suscripcion` con `{ plan: "premium" }`
+  3. Verificar suscripción `activa` con `flowSubscriptionId`
+  4. Verificar que Flow fue llamado
 
 ### IT-17: Tickets – envío y respuesta admin
 - **Prioridad:** Alta
 - **Pasos:**
   1. Usuario autenticado envía POST `/api/tickets` con asunto y descripción
   2. Verificar respuesta `201` y ticket en DB
-  3. Admin responde: PUT `/api/tickets/:id` con estado `respondido` y mensaje
+  3. Admin responde: PATCH `/api/tickets/:id` con estado `respondido` y mensaje
   4. Usuario obtiene GET `/api/tickets` → ver el ticket y la respuesta
 
 ### IT-18: Admin – historial global con filtros
 - **Prioridad:** Media
 - **Pasos:**
   1. Autenticarse como admin
-  2. GET `/api/admin/analisis` → listar todas las ejecuciones
-  3. GET `/api/admin/analisis?fechaDesde=...&fechaHasta=...&usuarioId=...&rubro=...`
+  2. GET `/api/admin/ejecuciones` → listar todas las ejecuciones
+  3. GET `/api/admin/ejecuciones?fechaDesde=...&fechaHasta=...&usuarioId=...&rubro=...`
   4. Verificar filtros aplicados correctamente
 
 ---
