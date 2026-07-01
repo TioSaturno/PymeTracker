@@ -14,6 +14,8 @@ export async function proxy(request: NextRequest) {
   if (isPublicPath) {
     const usuario = await getUsuarioFromRequest(request);
 
+    console.log(usuario)
+
     if (usuario) {
       if (
         pathname === "/auth/login" || pathname === "/auth/registro"
@@ -33,6 +35,10 @@ export async function proxy(request: NextRequest) {
 
   if (!usuario) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+
+  if (usuario.planActivo !== true) {
+    return NextResponse.redirect(new URL("/plan", request.url));
   }
 
   const isAdminPath = adminPaths.some(

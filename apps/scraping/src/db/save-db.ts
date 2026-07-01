@@ -1,7 +1,41 @@
 import { db } from "@pymetracker/db/create-client";
-import { analisis, usuarios } from "@pymetracker/db/schema";
+import { analisis, usuarios, tiendas, inventarios } from "@pymetracker/db/schema";
 import { eq } from "drizzle-orm";
 
+export async function obtenerDatosTiendaBase(analisisId: number) {
+  // 1. Obtener la tiendaId del análisis
+  const [analisisDb] = await db
+    .select({ tiendaId: analisis.tiendaId })
+    .from(analisis)
+    .where(eq(analisis.id, analisisId))
+    .limit(1);
+
+  if (!analisisDb || !analisisDb.tiendaId) return null;
+
+  // 2. Obtener la tienda
+  const [tienda] = await db
+    .select({ nombre: tiendas.nombre })
+    .from(tiendas)
+    .where(eq(tiendas.id, analisisDb.tiendaId))
+    .limit(1);
+
+  if (!tienda) return null;
+
+  // 3. Obtener los productos
+  const productos = await db
+    .select({
+      nombre: inventarios.nombre,
+      categoria: inventarios.categoria,
+      precio: inventarios.precio,
+    })
+    .from(inventarios)
+    .where(eq(inventarios.tiendaId, analisisDb.tiendaId));
+
+  return {
+    nombre: tienda.nombre,
+    productos,
+  };
+}
 export async function updateStatus(
   analisisId: number,
   status: string,

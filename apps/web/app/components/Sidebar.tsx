@@ -49,6 +49,9 @@ export default function Sidebar({ rol }: SidebarProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isAdmin = rol === "admin";
+  const allNavItems = isAdmin
+    ? navItems
+    : [...navItems, { href: "/tickets", label: "Soporte", icon: LifeBuoy }];
 
   useEffect(() => {
     async function cargarSucursales() {
@@ -188,7 +191,7 @@ export default function Sidebar({ rol }: SidebarProps) {
 
       {/* Nav */}
       <nav className="flex-1 space-y-2">
-        {navItems.map((item) => {
+        {allNavItems.map((item) => {
           const isActive = pathname === item.href;
           const Icon = item.icon;
           return (

@@ -16,6 +16,7 @@ server.post<{
   };
 }>("/run", async (request, reply) => {
   const { analisisId, topic, location, nResults, tiendaBase } = request.body;
+  console.log(`[Scraper Server] nResults recibido: ${nResults}`);
 
   if (!analisisId || !topic || !location || !nResults) {
     return reply.status(400).send({

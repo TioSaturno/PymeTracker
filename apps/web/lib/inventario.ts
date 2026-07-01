@@ -8,11 +8,18 @@ export interface Producto {
 
 export type NuevoProducto = Omit<Producto, "id" | "fechaCreacion">;
 
+export interface ImportarResultado {
+  importados: number;
+  omitidos: number;
+  errores?: string[];
+}
+
 export interface ProductosAPI {
   getProductos(): Promise<Producto[]>;
   crearProducto(data: NuevoProducto): Promise<Producto>;
   actualizarProducto(id: number, data: NuevoProducto): Promise<Producto>;
   eliminarProducto(id: number): Promise<void>;
+  importarCSV(productos: NuevoProducto[]): Promise<ImportarResultado>;
 }
 
 interface ProductoDB {
@@ -66,6 +73,19 @@ export function crearAPI(): ProductosAPI {
     async eliminarProducto(id) {
       const res = await fetch(`/api/inventario/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error("Error al eliminar producto");
+    },
+    async importarCSV(productos) {
+      const res = await fetch("/api/inventario/importar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ productos }),
+      });
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || "Error al importar productos");
+      }
+      const json = await res.json();
+      return json.data as ImportarResultado;
     },
   };
 }

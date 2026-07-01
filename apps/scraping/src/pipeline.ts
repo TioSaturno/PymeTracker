@@ -5,7 +5,13 @@ import { getPlacesData } from "./scrapers/scraper-maps";
 import { CONFIG, scrapeSitio } from "./scrapers/scraper";
 import { ProductoPrecio, PipelineOutput } from "./lib/scraperTypes";
 import { STRUCTURED_JSON_PROMPT } from "./lib/prompt";
-import { updateStatus, saveInDb, updateProcesado, obtenerEmailUsuario } from "./db/save-db";
+import {
+  updateStatus,
+  saveInDb,
+  updateProcesado,
+  obtenerEmailUsuario,
+  obtenerDatosTiendaBase,
+} from "./db/save-db";
 import { processWithDeepSeek } from "./services/deepseek";
 import { enviarCorreoAnalisis } from "./services/email";
 
@@ -85,6 +91,7 @@ export async function runPipeline(
 
     // 1. Places Search
     await updateStatus(analisisId, "places_search");
+    console.log(`[Pipeline] nResults recibido: ${nResults} — buscando en Google Maps...`);
     const places = await getPlacesData(topic, location, nResults);
     if (!places || places.length === 0) {
       console.log("No se encontraron lugares para analizar.");
@@ -125,7 +132,21 @@ export async function runPipeline(
 
     // 3. Preparar datos y analizar con LLM
     let tiendaBaseData: any = null;
-    if (tiendaBase) {
+    const dbTienda = await obtenerDatosTiendaBase(analisisId);
+    if (dbTienda) {
+      tiendaBaseData = {
+        localName: dbTienda.nombre,
+        PlacesData: {},
+        productosConPrecios: dbTienda.productos.map((p) => ({
+          producto: p.nombre,
+          precio: p.precio.toString(),
+          descripcion: p.categoria,
+        })),
+      };
+      console.log(
+        `\n🏪 Datos de tienda base obtenidos de BD: ${dbTienda.nombre}`,
+      );
+    } else if (tiendaBase) {
       const match = datosGlobales.find((local) =>
         local.localName.toLowerCase().includes(tiendaBase.toLowerCase()),
       );
@@ -135,7 +156,9 @@ export async function runPipeline(
           PlacesData: match.PlacesData,
           productosConPrecios: match.menu,
         };
-        console.log(`\n🏪 Tienda base identificada: ${match.localName}`);
+        console.log(
+          `\n🏪 Tienda base identificada de scraping: ${match.localName}`,
+        );
       } else {
         console.warn(
           `\n⚠️ No se encontró "${tiendaBase}" entre los resultados.`,
@@ -240,9 +263,7 @@ const pipeline = async (tiendaBase?: string) => {
       };
       console.log(`\n🏪 Tienda base identificada: ${match.localName}`);
     } else {
-      console.warn(
-        `\n⚠️ No se encontró "${tiendaBase}" entre los resultados.`,
-      );
+      console.warn(`\n⚠️ No se encontró "${tiendaBase}" entre los resultados.`);
     }
   }
 

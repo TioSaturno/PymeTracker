@@ -39,6 +39,7 @@ export async function getPlacesData(
     });
 
     const results = searchResponse.data.results.slice(0, nResults);
+    console.log(`[Scraper Maps] nResults solicitado: ${nResults} — lugares encontrados: ${results.length}`);
 
     if (results.length === 0) {
       console.log("No se encontraron resultados para esta búsqueda.");

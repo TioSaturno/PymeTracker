@@ -31,6 +31,7 @@ export async function POST(request: NextRequest) {
       rol: usuario.rol,
       empresaActivaId: usuario.empresaActivaId,
       tiendaActivaId: tiendaId,
+      planActivo: usuario.planActivo,
     })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("7d")

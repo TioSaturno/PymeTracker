@@ -22,7 +22,9 @@ export default function EjecutarAnalisis() {
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [perfilCompleto, setPerfilCompleto] = useState<boolean | null>(null);
+  const [nResults, setNResults] = useState<number>(3);
   const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const OPCIONES = [1, 3, 5, 10];
 
   useEffect(() => {
     async function checkProfile() {
@@ -59,7 +61,11 @@ export default function EjecutarAnalisis() {
     setStatus("pending");
 
     try {
-      const res = await fetch("/api/analisis", { method: "POST" });
+      const res = await fetch("/api/analisis", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nResults }),
+      });
       if (!res.ok) {
         const errData = await res.json();
         throw new Error(errData.error || "Error al iniciar análisis");
@@ -98,12 +104,32 @@ export default function EjecutarAnalisis() {
   return (
     <div className="w-full">
       {!ejecutando && !error && perfilCompleto === true && (
-        <button
-          onClick={iniciarAnalisis}
-          className="w-full bg-[#1b1c1c] text-white font-semibold py-3 px-6 rounded-xl hover:bg-[#333] transition-colors shadow-[0_8px_30px_rgb(0,0,0,0.12)] cursor-pointer"
-        >
-          Ejecutar Nuevo Análisis
-        </button>
+        <div className="w-full bg-white/80 backdrop-blur-xl rounded-2xl border border-[#e4e2e2] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] space-y-4">
+          <div className="flex items-center gap-4">
+            <span className="text-sm font-semibold text-[#4f4441]">Competidores:</span>
+            <div className="flex gap-2">
+              {OPCIONES.map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => setNResults(opt)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors cursor-pointer ${
+                    nResults === opt
+                      ? "bg-[#1b1c1c] text-white shadow-sm"
+                      : "bg-[#f5f3f3] text-[#4f4441] border border-[#e4e2e2] hover:bg-[#efeded]"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+          <button
+            onClick={iniciarAnalisis}
+            className="w-full bg-[#1b1c1c] text-white font-semibold py-3 px-6 rounded-xl hover:bg-[#333] transition-colors shadow-[0_8px_30px_rgb(0,0,0,0.12)] cursor-pointer"
+          >
+            Ejecutar Nuevo Análisis
+          </button>
+        </div>
       )}
 
       {!ejecutando && !error && perfilCompleto === false && (

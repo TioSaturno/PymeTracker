@@ -1,7 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@pymetracker/db/create-client";
-import { inventarios, tiendas } from "@pymetracker/db/schema";
+import { inventarios } from "@pymetracker/db/schema";
 import { eq, and, ilike, or } from "drizzle-orm";
 import { requireAuth } from "@/lib/auth";
 
@@ -11,21 +11,10 @@ export async function GET(request: NextRequest) {
     if (usuario instanceof NextResponse) return usuario;
 
     const { searchParams } = new URL(request.url);
-    const tiendaIdParam = searchParams.get("tiendaId");
     const categoria = searchParams.get("categoria");
     const q = searchParams.get("q");
 
-   
-    let tiendaId: number | null = tiendaIdParam ? parseInt(tiendaIdParam) : null;
-
-    if (!tiendaId && usuario.empresaActivaId) {
-      const [firstTienda] = await db
-        .select({ id: tiendas.id })
-        .from(tiendas)
-        .where(eq(tiendas.empresaId, usuario.empresaActivaId))
-        .limit(1);
-      if (firstTienda) tiendaId = firstTienda.id;
-    }
+    const tiendaId = usuario.tiendaActivaId;
 
     if (!tiendaId) {
       return NextResponse.json(
@@ -82,7 +71,7 @@ export async function POST(request: NextRequest) {
     if (usuario instanceof NextResponse) return usuario;
 
     const body = await request.json();
-    const { nombre, categoria, precio, tiendaId: bodyTiendaId } = body;
+    const { nombre, categoria, precio } = body;
 
     
     if (!nombre || !nombre.trim()) {
@@ -111,20 +100,11 @@ export async function POST(request: NextRequest) {
     }
 
     
-    let tiendaId: number | null = bodyTiendaId ? parseInt(bodyTiendaId) : null;
-
-    if (!tiendaId && usuario.empresaActivaId) {
-      const [firstTienda] = await db
-        .select({ id: tiendas.id })
-        .from(tiendas)
-        .where(eq(tiendas.empresaId, usuario.empresaActivaId))
-        .limit(1);
-      if (firstTienda) tiendaId = firstTienda.id;
-    }
+    const tiendaId = usuario.tiendaActivaId;
 
     if (!tiendaId) {
       return NextResponse.json(
-        { error: "No se encontró una tienda asociada para crear el producto" },
+        { error: "No hay una tienda activa seleccionada" },
         { status: 400 }
       );
     }
