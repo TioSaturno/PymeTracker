@@ -81,6 +81,17 @@ export default function HistorialPage() {
     fetchData();
   }, []);
 
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("es-CL", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   const exportToCSV = () => {
     const rows: string[][] = [];
     const headers = [
@@ -144,15 +155,66 @@ export default function HistorialPage() {
     URL.revokeObjectURL(url);
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString("es-CL", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const exportSingleToCSV = (exec: Execution) => {
+    const rows: string[][] = [];
+    const headers = [
+      "ID", "Fecha", "Estado", "Búsqueda", "Ubicación",
+      "Empresa", "Rating", "Reseñas", "Rango Precio", "Sitio Web",
+      "Producto", "Precio Producto",
+      "Mejor Valorado", "Más Criticado",
+    ];
+    rows.push(headers);
+
+    const fecha = formatDate(exec.fechaEjecucion);
+    const busqueda = exec.payload?.busqueda?.tema ?? "";
+    const ubicacion = exec.payload?.busqueda?.ubicacion ?? "";
+    const masValorado = exec.payload?.mas_valorado ?? "";
+    const masCriticado = exec.payload?.mas_criticado ?? "";
+    const empresas = exec.payload?.empresas ?? [];
+
+    if (empresas.length === 0) {
+      rows.push([String(exec.id), fecha, exec.status, busqueda, ubicacion, "", "", "", "", "", "", "", masValorado, masCriticado]);
+    } else {
+      for (const empresa of empresas) {
+        const precios = empresa.precios ?? [];
+        if (precios.length === 0) {
+          rows.push([
+            String(exec.id), fecha, exec.status, busqueda, ubicacion,
+            empresa.nombre, String(empresa.calificaciones?.rating ?? ""),
+            String(empresa.calificaciones?.total_resenas ?? ""),
+            empresa.calificaciones?.rango_precio_gmaps ?? "",
+            empresa.sitio_web ?? "",
+            "", "",
+            masValorado, masCriticado,
+          ]);
+        } else {
+          for (const precio of precios) {
+            rows.push([
+              String(exec.id), fecha, exec.status, busqueda, ubicacion,
+              empresa.nombre, String(empresa.calificaciones?.rating ?? ""),
+              String(empresa.calificaciones?.total_resenas ?? ""),
+              empresa.calificaciones?.rango_precio_gmaps ?? "",
+              empresa.sitio_web ?? "",
+              precio.producto, String(precio.precio),
+              masValorado, masCriticado,
+            ]);
+          }
+        }
+      }
+    }
+
+    const csvContent = rows.map((row) =>
+      row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(",")
+    ).join("\n");
+
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    const safeName = exec.summary.replace(/[^a-zA-Z0-9]/g, "_").slice(0, 40);
+    link.download = `analisis-${exec.id}-${safeName}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   const getStatusBadge = (status: string) => {
@@ -218,7 +280,18 @@ export default function HistorialPage() {
                         {formatDate(exec.fechaEjecucion)}
                       </p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); exportSingleToCSV(exec); }}
+                        className="p-2 border border-[#e4e2e2] rounded-lg text-[#817470] hover:text-[#4f4441] hover:bg-[#f5f3f3] transition-all duration-200 flex items-center justify-center"
+                        title="Exportar CSV"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="7 10 12 15 17 10"/>
+                          <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                      </button>
                       <span className={`px-3 py-1 border rounded-full text-xs font-semibold uppercase ${getStatusBadge(exec.status)}`}>
                         {exec.status}
                       </span>
