@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUsuarioFromRequest } from "./lib/auth";
+import { getUsuarioFromRequest } from "./lib/auth-edge";
 
 const publicPaths = ["/auth", "/plan", "/api"];
 const adminPaths = ["/admin"];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPublicPath = publicPaths.some(
