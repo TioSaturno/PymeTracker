@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Plus, RefreshCw, Package, DollarSign, Tag } from "lucide-react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import { Plus, Upload, RefreshCw, Package, DollarSign, Tag } from "lucide-react";
 import PageHeader from "@/app/components/PageHeader";
 import InventarioTable, { type SortField, type SortDirection } from "@/app/components/inventario/InventarioTable";
 import ModalProducto from "@/app/components/inventario/ModalProducto";
@@ -23,6 +23,9 @@ export default function InventarioPage() {
   const [modalAbierto, setModalAbierto] = useState(false);
   const [productoAEditar, setProductoAEditar] = useState<Producto | null>(null);
   const [eliminarConfirm, setEliminarConfirm] = useState<Producto | null>(null);
+  const [importFeedback, setImportFeedback] = useState<{ tipo: "success" | "error"; texto: string } | null>(null);
+  const [importando, setImportando] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const cargar = useCallback(async () => {
     setLoading(true);
@@ -122,23 +125,118 @@ export default function InventarioPage() {
     }
   };
 
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImportFeedback(null);
+    setError(null);
+    setImportando(true);
+
+    try {
+      const text = await file.text();
+      const lineas = text.split("\n").filter((l) => l.trim());
+
+      if (lineas.length === 0) {
+        setImportFeedback({ tipo: "error", texto: "El archivo está vacío" });
+        return;
+      }
+
+      const productos: NuevoProducto[] = [];
+      let omitidas = 0;
+
+      for (const linea of lineas) {
+        const partes = linea.split(";").map((p) => p.trim());
+        if (partes.length !== 3) {
+          omitidas++;
+          continue;
+        }
+        const [nombre, categoria, precioStr] = partes;
+        const precio = Number(precioStr);
+        if (!nombre || !categoria || isNaN(precio) || precio < 0) {
+          omitidas++;
+          continue;
+        }
+        productos.push({ nombre, categoria, precio });
+      }
+
+      if (productos.length === 0) {
+        setImportFeedback({
+          tipo: "error",
+          texto: "No se encontraron productos válidos en el archivo. Usa el formato: nombre;categoria;precio",
+        });
+        return;
+      }
+
+      const resultado = await api.importarCSV(productos);
+      await cargar();
+
+      const partesMsg = [`Se importaron ${resultado.importados} producto${resultado.importados !== 1 ? "s" : ""}`];
+      if (resultado.omitidos > 0) {
+        partesMsg.push(`${resultado.omitidos} línea${resultado.omitidos !== 1 ? "s" : ""} omitida${resultado.omitidos !== 1 ? "s" : ""} por formato inválido`);
+      }
+      setImportFeedback({ tipo: "success", texto: partesMsg.join(". ") });
+    } catch (err) {
+      setImportFeedback({
+        tipo: "error",
+        texto: err instanceof Error ? err.message : "Error al importar el archivo",
+      });
+    } finally {
+      setImportando(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#fbf9f8] flex flex-col" style={{ fontFamily: "'Inter', sans-serif" }}>
       <PageHeader
         pageTitle={<>GESTIÓN DE<br />INVENTARIO</>}
         pageDescription="Administra los productos y precios de tu tienda"
       >
-        <button
-          onClick={abrirModalCrear}
-          className="bg-[#725950] text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)] cursor-pointer"
-        >
-          <Plus className="h-4 w-4" />
-          Nuevo Producto
-        </button>
+        <div className="flex gap-3">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv"
+            onChange={handleFileChange}
+            className="hidden"
+          />
+          <button
+            onClick={handleImportClick}
+            disabled={importando}
+            className="border border-[#725950] text-[#725950] px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium hover:bg-[#725950] hover:text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          >
+            <Upload className="h-4 w-4" />
+            {importando ? "Importando..." : "Importar CSV"}
+          </button>
+          <button
+            onClick={abrirModalCrear}
+            className="bg-[#725950] text-white px-5 py-2.5 rounded-xl flex items-center gap-2 text-sm font-medium hover:bg-[#5d4a42] transition-all duration-200 shadow-[0_4px_16px_rgba(114,89,80,0.2)] cursor-pointer"
+          >
+            <Plus className="h-4 w-4" />
+            Nuevo Producto
+          </button>
+        </div>
       </PageHeader>
 
       <div className="flex-1 p-8">
         <div className="max-w-5xl mx-auto space-y-6">
+
+          {importFeedback && (
+            <div className={`border rounded-2xl p-4 ${
+              importFeedback.tipo === "success"
+                ? "border-[#dbe3f1] bg-[#dbe3f1]/30"
+                : "border-[#ffdad6] bg-[#ffdad6]/30"
+            }`}>
+              <p className={`text-sm font-semibold ${
+                importFeedback.tipo === "success" ? "text-[#575f6b]" : "text-[#ba1a1a]"
+              }`}>{importFeedback.texto}</p>
+            </div>
+          )}
 
           {error && (
             <div className="border border-[#ffdad6] bg-[#ffdad6]/30 rounded-2xl p-4">
